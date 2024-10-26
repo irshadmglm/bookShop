@@ -1,0 +1,112 @@
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f9f3e3;
+    }
+
+    .sidebar-container {
+        width: 220px;
+        background-color: #fff8e1;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+    }
+
+    .menu-section {
+        margin-bottom: 20px;
+    }
+
+    .menu-header {
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .menu-header i {
+        margin-right: 8px;
+        color: #d18e06;
+    }
+
+    .menu-item {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        color: #555;
+        font-size: 16px;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .menu-item:hover {
+        background-color: #ffe08c;
+        color: #333;
+    }
+
+    .menu-item i {
+        margin-right: 10px;
+        color: #d18e06;
+    }
+
+    /* Active style for the 'My Account' */
+    .menu-item.active {
+        background-color: #ffe08c;
+        font-weight: bold;
+        color: #333;
+    }
+</style>
+
+
+
+
+<div class="sidebar-container">
+    <!-- Dashboard Section -->
+    <div class="menu-section">
+        <a href="#" class="menu-item">
+            <i class="fas fa-th"></i> Dashboard
+        </a>
+    </div>
+
+    <!-- My Account Section -->
+    <div class="menu-section">
+        <a href="#" class="menu-item active">
+            <i class="fas fa-user"></i> My Account
+        </a>
+    </div>
+
+    <!-- Other Menu Options -->
+    <div class="menu-section">
+        <a href="#" class="menu-item">
+            <i class="fas fa-map-marker-alt"></i> Address
+        </a>
+        <a href="#" class="menu-item">
+            <i class="fas fa-ticket-alt"></i> Coupons
+        </a>
+        <a href="#" class="menu-item">
+            <i class="fas fa-history"></i> Order History
+        </a>
+        <a href="#" class="menu-item">
+            <i class="fas fa-shopping-cart"></i> Shopping Cart
+        </a>
+        <a href="#" class="menu-item">
+            <i class="fas fa-wallet"></i> Wallet
+        </a>
+        <a href="#" class="menu-item">
+            <i class="fas fa-heart"></i> Wish List
+        </a>
+        <a href="#" class="menu-item">
+            <i class="fas fa-sign-out-alt"></i> Log Out
+        </a>
+    </div>
+</div>

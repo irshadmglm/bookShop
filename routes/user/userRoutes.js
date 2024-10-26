@@ -2,6 +2,9 @@ const express = require('express');
 const userHelper = require('../../helpers/user/userHelper');
 const passport = require('passport');
 const bookHelper = require('../../helpers/admin/bookHelper');
+const { redirect, render } = require('express/lib/response');
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const router = express.Router();
 require('../../middlewares/auth')
 
@@ -121,27 +124,82 @@ router.get('/auth/google/callback', passport.authenticate('google', {
     }
 );
 
+router.get('/user-info',(req,res)=>{
+    userHelper.userAddress(req.session.user.Id).then((address)=>{
+        res.render('user/userhome',{address:address,user:req.session.user})
+    }).catch((err)=>{
+        console.log(err);
+        res.redirect('/');
+    })
+})
 
+router.get('/edit-user',(req,res)=>{
+    res.render('user/editUser',{user:req.session.user});
+});
+
+router.post('/adit-user',(req,res)=>{
+    userHelper.apdateUser(req.body).then(()=>{
+        res.redirect('/user-info');
+    }).catch((error)=>{
+        console.log(error);
+        res.redirect('/edit-user');
+        
+    })
+})
+router.get('/edit-address',(req,res)=>{
+    userHelper.getOneAddress(req.query.addressId,req.session.user._id).then((address)=>{
+    res.render('user/editAddress',{address:address});
+    })
+})
+router.post('/edit-address',(req,res)=>{
+    userHelper.editAddress(req.body,req.session.user._id).then(()=>{
+        res.redirect("/user-info");
+    }).catch((err)=>{
+        console.log(err);
+        res.redirect('/edit-address');
+    })
+})
+
+router.get('/forgot-password',(req,res)=>{
+    res.render('user/forgotPassword')
+})
+router.post('/forgot-password',async(req,res)=>{
+    const { email } = req.body;
+    const user = await userHelper.getUser(email);
+    if(!user){
+        console.log("This email not registard");
+    }
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiration = Date.now() + 3600000; 
+    await userHelper.addPasswordResets(email,token,expiration);
+    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+     userHelper.sendResetEmail(email, resetLink);
+     res.redirect('/');
+})
+
+router.get('/reset-password',async(req,res)=>{
+    const { token } = req.query;
+    const resetRequest = await userHelper.getPasswordResets(token);
+    if (!resetRequest || resetRequest.expiration < Date.now()) {
+       console.log('Token expired or invalid');
+    }else{
+        res.render('user/resetPassword',{token:token});
+    }
+
+})
+router.post('/reset-password', async (req, res) => {
+    const { newPassword, token } = req.body;
+    const resetRequest = await userHelper.getPasswordResets(token);
+    
+    if (!resetRequest || resetRequest.expiration < Date.now()) {
+        console.log('Token expired or invalid');  
+    }
+    const email = resetRequest.email;
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await userHelper.updatePassword(email,hashedPassword,token);
+    console.log('Password has been reset successfully');
+    res.render('user/success');
+});
 
 
 module.exports = router;
-
-// OTP Verification Route
-// router.post('/verify-otp', async (req, res) => {
-//     const userOtp = req.body.otp;
-//     const hashedOTP = req.session.otp;
-//     const otpExpires = req.session.otpExpires;
-
-//     // Check if OTP is expired
-//     if (Date.now() > otpExpires) {
-//         return res.status(400).json({ message: 'OTP has expired' });
-//     }
-
-//     // Compare the OTP (after hashing) with the stored hash
-//     const isMatch = await bcrypt.compare(userOtp, hashedOTP);
-//     if (isMatch) {
-//         res.status(200).json({ message: 'OTP verified successfully' });
-//     } else {
-//         res.status(400).json({ message: 'Invalid OTP' });
-//     }
-// });

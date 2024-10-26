@@ -3,5 +3,7 @@ module.exports = {
     ADMIN_COLLECTION : 'admins',
     BOOK_COLLECTION : 'books',
     CATEGORIES_COLLECTION : 'categories',
-    RATING_COLLECTION : 'rating'
+    RATING_COLLECTION : 'rating',
+    ADDRESS_COLLECTION : 'address',
+    PASSWORD_RESETS_COLLECTION : 'passwordResets'
 }

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+      
+        .container {
+            margin: 120px 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        /* Card Styling */
+        .card {
+            flex: 1;
+            padding: 25px;
+            background-color: #fbf6ea;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #ffe602;
+        }
+
+        /* Card Header */
+        .card-header {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 20px;
+            color: #333;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 20px;
+        }
+
+        .card-header i {
+            margin-right: 10px;
+            font-size: 24px;
+            color: #d18e06;
+        }
+
+        /* Information Styling */
+        .info-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            font-size: 15px;
+            color: #555;
+        }
+
+        .info-item i {
+            margin-right: 10px;
+            color: #ffbb00;
+        }
+
+        .info-text {
+            font-weight: bold;
+            color: #333;
+            font-family: 'Arial', sans-serif;
+
+        }
+
+        .sub-text {
+            color: #777;
+            font-size: 14px;
+            font-family: 'Arial', sans-serif;
+
+        }
+
+        /* Button Styling */
+        .edit-button {
+            display: block;
+            margin-top: 20px;
+            padding: 12px 0;
+            font-size: 15px;
+            font-weight: bold;
+            color: #eaad05;
+            background-color: #fffaf0;
+            border: 1px solid #dba205;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .edit-button:hover {
+            background-color: #ffbb00;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Account Info Card -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-user"></i> Account Information
+        </div>
+        <div class="info-group">
+            <div class="info-item">
+                <i class="fas fa-user-circle"></i>
+                <span class="info-text">David George</span>
+                <span class="sub-text" style="margin-left: 5px;">(Kerala)</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-envelope"></i>
+                <span>davidgeorge@gmail.com</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-phone-alt"></i>
+                <span>+9075421485</span>
+            </div>
+        </div>
+        <button class="edit-button">Edit Account</button>
+    </div>
+
+    <!-- Billing Address Card -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-address-card"></i> Billing Address
+        </div>
+        <div class="info-group">
+            <div class="info-item">
+                <i class="fas fa-user-circle"></i>
+                <span class="info-text">David George</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-home"></i>
+                <span>Retro Fits, 4th Gate, TVM</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-map-pin"></i>
+                <span>Pin: 6730</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-phone-alt"></i>
+                <span>+9075421485</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-envelope"></i>
+                <span>davidgeorge@gmail.com</span>
+            </div>
+        </div>
+        <button class="edit-button">Edit Address</button>
+    </div>
+</div>
+
+</body>
+</html>
