@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Book Catalog</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        /* Basic reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling */
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        /* Container for the catalog */
+        .container {
+            max-width: 1200px;
+            margin-left: 280px ;
+            padding: 20px;
+        }
+
+        /* Header section */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* Sorting dropdown */
+        .sort {
+            font-size: 16px;
+        }
+
+        /* Search bar */
+        .search {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .search input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+            width: 100%;
+        }
+
+        .search-btn {
+            background-color: #f39c12;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            font-size: 18px;
+            color: #fff;
+            border-radius: 4px;
+        }
+
+        /* Add book button */
+        .add-book-btn {
+            padding: 10px 16px;
+            background-color: #f39c12;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .add-book-btn:hover {
+            background-color: #d35400;
+        }
+
+        /* Book table styles */
+        .book-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .book-table thead {
+            background-color:  #fcecc3;
+        }
+
+        .book-table th, .book-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .book-table th {
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .book-table td img {
+            width: 50px;
+            height: auto;
+            display: block;
+        }
+
+        .book-table td {
+            vertical-align: middle;
+        }
+
+        /* Action buttons */
+        .icon-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            margin: 0 5px;
+            color: #f39c12;
+        }
+
+        .icon-btn:hover {
+            color: #d35400;
+        }
+
+        /* Footer styling */
+        footer {
+            background-color: #f5f5f5;
+            padding: 40px 0;
+            font-family: 'Poppins', sans-serif;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/sidebar') %>
+    <!-- Main Content Container -->
+    <div class="container">
+        <div class="header">
+            <div class="sort">
+                <label for="category">Sort by category:</label>
+                <select id="category" name="categoryId">
+                    <option value="">Select</option>
+                    <option value="0">All</option>
+                    <option value="1">Fiction</option>
+                    <option value="2">Non-Fiction</option>
+                    <option value="3">Science</option>
+                    <option value="4">Biography</option>
+                    <option value="5">History</option>
+                    <option value="6">Self-help</option>
+                    <option value="7">Mystery</option>
+                    <option value="8">Romance</option>
+                    <option value="9">Fantasy</option>
+                    <option value="10">Thriller</option>
+                </select>
+            </div>
+
+            <!-- Search and Add Book Button -->
+            <div class="search">
+                <input type="text" placeholder="Search...">
+                <button class="search-btn">&#128269;</button>
+            </div>
+            
+            <div>
+                <!-- <button class="add-book-btn" onclick="window.location.href='/books/deleted-book'">&#128465;</button> -->
+            </div>
+        </div>
+
+        <!-- Books Table -->
+        <table class="book-table">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Book Name</th>
+                    <th>Category</th>
+                    <th>Stock</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% books.forEach(book => { %>
+                    <tr>
+                        <td><img src="/images/uploads/<%=book.bookDetails.coverImageName%>" alt="Book Cover"></td>
+                        <td><%= book.bookDetails.book_name %></td>
+                        <td><%= book.bookDetails.categoryId %></td>
+                        <td><%= book.bookDetails.stock %></td>
+                        <td>&#8377; <%= book.bookDetails.price %></td>
+                        <td>
+                            <button value="<%= book._id %>" class="icon-btn recover">
+                                <i class="fas fa-recycle"></i>
+                            </button>                            
+                            
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Footer -->
+    <%- include('../partials/footer') %>
+
+    <script>
+        const categoryDropdown = document.getElementById('category');
+        categoryDropdown.addEventListener('change', function() {
+            const selectedCategoryId = this.value;
+            if (selectedCategoryId) {
+                window.location.href = `/books?categoryId=${selectedCategoryId}`;
+            }
+        });
+
+        
+
+        document.querySelectorAll('.recover').forEach(button => {
+            button.addEventListener('click', function() {
+                const bookId = this.value;
+                if (bookId) {
+                    window.location.href = `/books/recover-book?bookId=${bookId}`;
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

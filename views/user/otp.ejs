@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #fff4d6;
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            display: flex;
+            width: 70%;
+            max-width: 1000px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .left-section, .right-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .left-section {
+            width: 50%;
+            background-color: #fff4d6;
+        }
+
+        .left-section h1 {
+            font-size: 3rem;
+            color: #7f5b2d;
+            text-align: center;
+        }
+
+        .right-section {
+            width: 50%;
+            padding: 30px;
+            border-left: 2px solid #f9df9f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .otp-container {
+            width: 80%;
+            max-width: 350px;
+            padding: 30px;
+            border: 2px solid #f9df9f;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .otp-container h2 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: #444;
+        }
+        .otp-container p {
+            color: red;
+            margin-bottom: 15px;
+        }
+
+        .otp-inputs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            margin-left: 30px;
+        }
+
+        .otp-inputs input {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            font-size: 1.5rem;
+            text-align: center;
+            outline: none;
+        }
+
+        .otp-inputs input:focus {
+            border-color: #f0a500;
+        }
+
+        .verify-btn {
+            display: block;
+            width: 100%;
+            padding: 10px 0;
+            margin-top: 30px;
+            background-color: #f0a500;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .verify-btn:hover {
+            background-color: #d38f00;
+        }
+
+        .resend-otp {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .resend-otp a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .timer {
+            margin-left: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-section">
+            <h1>Book Shop</h1>
+        </div>
+        <div class="right-section">
+            <div class="otp-container">
+                <h2>OTP Verification</h2>
+                <p ><%= message || ' ' %></p>
+                <div class="otp-inputs">
+                    <form action="/verify-otp" method="post">
+                        <input type="text" maxlength="1" name="otp[]" required>
+                        <input type="text" maxlength="1" name="otp[]" required>
+                        <input type="text" maxlength="1" name="otp[]" required>
+                        <input type="text" maxlength="1" name="otp[]" required>
+                    <button type="submit" class="verify-btn">Verify OTP</button>
+                        
+                    </form>
+                </div>
+                <div class="resend-otp">
+                    <a href="/resend-otp">Resend OTP?</a>
+                    <span class="timer" id="timer">02:00</span> <!-- Timer will update here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set the countdown time (2 minutes = 120 seconds)
+        let timeLeft = 120;
+        const timerElement = document.getElementById("timer");
+
+        // Function to format time as MM:SS
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+        }
+
+        // Update the countdown every second
+        const countdown = setInterval(() => {
+            timeLeft--;
+            timerElement.textContent = formatTime(timeLeft);
+
+            // When time is up, stop the timer
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                timerElement.textContent = "00:00"; // Time's up message
+            }
+        }, 1000); // Update every second (1000 milliseconds)
+    </script>
+</body>
+</html>

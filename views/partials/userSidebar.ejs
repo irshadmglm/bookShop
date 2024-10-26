@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar Design with Filters</title>
+    <!-- Include Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .sidebar {
+            width: 230px;
+            background-color: #fff5d9;
+            height: 100vh;
+            padding: 20px;
+            position: fixed;
+            left: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar .menu-item {
+            padding: 10px 15px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar .menu-item:hover {
+            background-color: #ffe07a;
+        }
+
+        /* .sidebar .menu-item.active {
+            background-color: #ffe07a;
+        } */
+
+        .sidebar .menu-item i {
+            margin-right: 10px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .sidebar .section-title {
+            font-weight: bold;
+            font-size: 10px;
+            margin: 20px 0 10px;
+            color: #333;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #ccc;
+            margin: 10px 0;
+        }
+
+        .filter-section {
+            margin-top: 20px;
+        }
+
+        .filter-section select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: #f9f9f9;
+        }
+
+        .filter-section label {
+            font-size: 12px;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .filter-section button {
+            width: 100%;
+            padding: 10px;
+            background-color: #443405;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .filter-section button:hover {
+            background-color: #f9d45b;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <!-- Main menu items -->
+    <div class="menu-item">
+        <i class="fas fa-th-large"></i>
+        <span>Dashboard</span>
+    </div>
+    <div class="divider"></div>
+    
+    <div class="section-title">MY ACCOUNT</div>
+    <div class="menu-item">
+        <i class="fas fa-user"></i>
+        <span>Address</span>
+    </div>
+    <div class="menu-item">
+        <i class="fas fa-ticket-alt"></i>
+        <span>Coupons</span>
+    </div>
+    <div class="menu-item active">
+        <i class="fas fa-history"></i>
+        <span>Order history</span>
+    </div>
+    <div class="menu-item">
+        <i class="fas fa-shopping-cart"></i>
+        <span>Shopping cart</span>
+    </div>
+    <div class="menu-item">
+        <i class="fas fa-wallet"></i>
+        <span>Wallet</span>
+    </div>
+    <div class="menu-item">
+        <i class="fas fa-heart"></i>
+        <span>Wish list</span>
+    </div>
+    <div class="menu-item">
+        <a href="http://localhost:3000/logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Log out</span>
+        </a>
+    </div>
+    
+
+    <div class="divider"></div>
+
+    <!-- Filter section -->
+    <div class="filter-section">
+        <div class="section-title">FILTER BY</div>
+
+        <!-- Filter by Category -->
+        <label for="category-filter">Category</label>
+        <select id="category-filter" name="category">
+            <option value="">All Categories</option>
+            <% categories.forEach(category => { %>
+                <option value="<%= category._id %>"><%= category.categoryData.categoryName %></option>
+            <% }) %>
+        </select>
+
+        <!-- Filter by Price -->
+        <label for="price-filter">Price</label>
+        <select id="price-filter" name="price">
+            <option value="">All Prices</option>
+            <option value="0-50">$0 - $50</option>
+            <option value="51-100">$51 - $100</option>
+            <option value="101-200">$101 - $200</option>
+            <option value="201+">$201 and above</option>
+        </select>
+
+        <!-- Submit Button for Filters -->
+        <button onclick="applyFilters()" >Apply Filters</button>
+    </div>
+</div>
+<script>
+    function applyFilters() {
+        const categoryId = document.getElementById('category-filter').value;
+        const price = document.getElementById('price-filter').value;
+        window.location.href = `/books/filter?categoryId=${categoryId}&price=${price}`;
+    }
+</script>
+
+</body>
+</html>

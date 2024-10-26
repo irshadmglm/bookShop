@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Shop Sign-up</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: #fff4d6;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+.left-section {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.left-section h1 {
+    font-size: 48px;
+    color: #643308;
+    font-family: 'Georgia', serif;
+}
+
+.right-section {
+    flex: 1;
+    padding: 150px;
+}
+.right-section p:nth-of-type(1) {
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: #FF0000; 
+}
+
+.right-section h2 {
+    font-size: 24px;
+    color: #643308;
+    margin-bottom: 20px;
+    font-family: 'Georgia', serif;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-bottom: 2px solid #000;
+    background: transparent;
+    outline: none;
+}
+
+.signup-btn {
+    padding: 10px;
+    background-color: #643308;
+    color: white;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    width: 100%;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+}
+
+.signup-btn:hover {
+    background-color:  #f6aa11;;
+}
+
+.social-login {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.social-icons img {
+    width: 30px;
+    margin: 0 10px;
+}
+
+.social-login p {
+    margin: 10px 0;
+}
+
+a {
+    color: #b08a39;
+    text-decoration: none;
+}
+.social-icons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+    }
+
+    .social-icon i {
+        font-size: 30px;
+        color: #3d2804;
+        transition: color 0.3s ease;
+    }
+
+    .social-icon i:hover {
+        color:  #f6aa11; 
+    }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-section">
+            <h1>Book shop</h1>
+        </div>
+        <div class="right-section">
+            <h2>create new account</h2>
+            <p><%= message %></p>
+            <form action="/signup" method="post">
+                <div class="input-group">
+                    <input type="text" placeholder="Name" name="name" required>
+                </div>
+                <div class="input-group">
+                    <input type="email" placeholder="Email" name="email" required>
+                </div>
+                <div class="input-group">
+                    <input type="tel" placeholder="Phone number" name="phone" pattern="[0-9]{10}" title="Enter a 10-digit phone number" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" placeholder="Password" name="password" minlength="4" maxlength="16"  required>
+                </div>
+                <input type="hidden" name="joined_date" id="joined_date" value="">
+                <input type="hidden" name="last_logedIn" id="last_logedIn" value="">
+                <input type="hidden" name="isBlocked" id="status" value="">
+                <button class="signup-btn">Sign-up</button>
+            </form>
+            <div class="social-login">
+                <p>OR</p>
+                <div class="social-icons">
+                    <a href="/auth/google" class="social-icon">
+                        <i class="fab fa-google"></i>
+                    </a>
+                    <a href="/auth/facebook" class="social-icon">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                </div>
+                <p>Returning user? <a href="/">Log in here</a></p>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('status').value = false;
+        let timeStamp = new Date().toISOString();
+        document.addEventListener("DOMContentLoaded",()=>{
+            document.getElementById('joined_date').value = timeStamp;
+        })
+        document.addEventListener("DOMContentLoaded",()=>{
+            document.getElementById('last_logedIn').value = timeStamp;
+        })
+    </script>
+</body>
+</html>

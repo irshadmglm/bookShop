@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Add Book Form</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css">
+    <script src="https://unpkg.com/cropperjs/dist/cropper.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding-left: 280px;
+           
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-container {
+            display: flex; 
+            flex-wrap: wrap;
+            gap: 30px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+
+        }
+        .form-group {
+            flex: 1;
+            min-width: 250px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .image-upload {
+            flex: 1;
+            min-width: 250px;
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            color: #aaa;
+        }
+        .image-upload img {
+    max-width: 100%; /* Make sure the image fits within the container */
+    max-height: 300px; /* Limit the height to a standard size */
+    object-fit: contain; /* Ensure the image retains its aspect ratio */
+}
+
+        .stock-controls {
+            display: flex;
+            justify-content: space-between;
+            max-width: 150px;
+        }
+        .btn {
+            background-color: #f0ad4e;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #ec971f;
+        }
+        .btn.cancel {
+            background-color: #d9534f;
+        }
+        .btn.cancel:hover {
+            background-color: #c9302c;
+        }
+        button[type="button"] {
+            background-color: transparent;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Add a New Book</h1>
+<%- include('../partials/sidebar') %>
+
+    <form class="form-container" enctype="multipart/form-data" action="/books/add-book" method="post" id="bookForm">
+        <!-- Book Form Fields -->
+        <div class="form-group">
+            <label for="book-name">Name of the Book</label>
+            <input type="text" id="book-name" name="book_name" placeholder="Type here" required>
+        </div>
+        <div class="form-group">
+            <label for="category">Category</label>
+            <select id="category" name="categoryId" required>
+                <option value="">Select</option>
+                <% categories.forEach(category => { %>
+                    <option value="<%= category._id %>"><%= category.categoryData.categoryName %></option>
+                    <% }) %>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="author-name">Name of Author</label>
+            <input type="text" id="author-name" name="author_name" placeholder="Type here" required>
+        </div>
+        <div class="form-group">
+            <label for="pages">Pages</label>
+            <select id="pages" name="pages" required>
+                <option value="">Select</option>
+                <option value="100">100</option>
+                <option value="200">200</option>
+                <option value="300">300</option>
+                <option value="400">400</option>
+                <option value="500">500</option>
+                <option value="600">600</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="publisher-name">Name of Publisher</label>
+            <input type="text" id="publisher-name" name="publisher_name" placeholder="Type here" required>
+        </div>
+        <div class="form-group">
+            <label for="price">Price</label>
+            <input type="text" id="price" name="price" placeholder="Type here" required>
+        </div>
+        <div class="form-group">
+            <label for="language">Language</label>
+            <select id="language" name="language" required>
+                <option value="">Select</option>
+                <option value="english">English</option>
+                <option value="spanish">Spanish</option>
+                <option value="french">French</option>
+                <option value="german">German</option>
+                <option value="chinese">Chinese</option>
+                <option value="japanese">Japanese</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="published-date">Published Date</label>
+            <input type="date" id="published-date" name="published_date" required>
+        </div>
+        <div class="form-group">
+            <label for="stock">Stock</label>
+            <div class="stock-controls">
+                <input type="number" id="stock" name="stock" value="2" min="0" required>
+            </div>
+        </div>
+       
+        <div class="form-group">
+            <label for="about-book">About Book</label>
+            <textarea id="about-book" name="about_book" rows="4" placeholder="Type here"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="about-author">About Author</label>
+            <textarea id="about-author" name="about_author" rows="4" placeholder="Type here"></textarea>
+        </div>
+        <br>
+        <div class="image-upload">
+            <label for="uploadCover">Upload Cover Image</label>
+            <input type="file" id="uploadCover" name="cover_image" accept="image/*">
+            <img id="coverImage" style="display:none;">
+            <canvas id="canvasCover"></canvas>
+            <button type="button" id="cropCoverBtn" class="btn">Crop Cover Image</button>
+            <input type="hidden" id="coverImageName" name="coverImageName">
+        </div>
+
+        <!-- Back Image Upload -->
+        <div class="image-upload">
+            <label for="uploadBack">Upload Back Image</label>
+            <input type="file" id="uploadBack" name="back_image" accept="image/*">
+            <img id="backImage" style="display:none;">
+            <canvas id="canvasBack"></canvas>
+            <button type="button" id="cropBackBtn" class="btn">Crop Back Image</button>
+            <input type="hidden" id="backImageName" name="backImageName">
+        </div>
+
+        <!-- Content Image Upload -->
+        <div class="image-upload">
+            <label for="uploadContent">Upload Content Image</label>
+            <input type="file" id="uploadContent" name="content_image" accept="image/*">
+            <img id="contentImage" style="display:none;">
+            <canvas id="canvasContent"></canvas>
+            <button type="button" id="cropContentBtn" class="btn">Crop Content Image</button>
+            <input type="hidden" id="contentImageName" name="contentImageName">
+        </div>
+
+        <!-- Submit and Cancel Buttons -->
+        <div class="form-group" style="flex-basis: 100%;">
+            <button type="submit" class="btn">Add Book</button>
+            <button type="button" class="btn cancel">Cancel</button>
+        </div>
+    </form>
+<%- include('../partials/footer') %>
+<script>
+    // Function to handle image cropping for each section (cover, back, content)
+    function setupImageCropper(uploadInputId, imageElementId, canvasId, cropBtnId, imageNameId) {
+        const uploadInput = document.getElementById(uploadInputId);
+        const imageElement = document.getElementById(imageElementId);
+        const canvas = document.getElementById(canvasId);
+        const cropBtn = document.getElementById(cropBtnId);
+        const imageNameInput = document.getElementById(imageNameId);
+        let cropper;
+
+        uploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                imageElement.src = e.target.result;
+                imageElement.style.display = 'block'; // Show the image
+
+                if (cropper) {
+                    cropper.destroy(); // Destroy previous instance
+                }
+
+                cropper = new Cropper(imageElement, {
+                    aspectRatio: 3 / 4, // Adjust the aspect ratio to 4:3
+                    viewMode: 1,
+                    responsive: true,  // Make the cropper responsive to the container size
+                });
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        });
+
+        cropBtn.addEventListener('click', () => {
+            const canvasData = cropper.getCroppedCanvas();
+
+            if (!canvasData) {
+                alert("Please upload and crop the image first.");
+                return;
+            }
+
+            // Convert canvas to Blob (binary large object)
+            canvasData.toBlob((blob) => {
+                const timestamp = new Date().toISOString().replace(/[-:.]/g, ''); // Format: YYYYMMDDTHHMMSS
+                const croppedFile = new File([blob], `${timestamp}.jpg`, { type: 'image/jpeg' });
+
+                // Create a DataTransfer object and append the cropped file to it
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(croppedFile);
+
+                // Replace the original file input with the cropped file
+                uploadInput.files = dataTransfer.files;
+                imageNameInput.value = croppedFile.name;
+
+                alert('Image cropped and input updated!');
+                if (cropper) {
+                    cropper.destroy(); // Destroy previous instance
+                }
+            }, 'image/jpeg');
+        });
+    }
+
+    // Setup the croppers for each image field
+    setupImageCropper('uploadCover', 'coverImage', 'canvasCover', 'cropCoverBtn', 'coverImageName');
+    setupImageCropper('uploadBack', 'backImage', 'canvasBack', 'cropBackBtn', 'backImageName');
+    setupImageCropper('uploadContent', 'contentImage', 'canvasContent', 'cropContentBtn', 'contentImageName');
+
+    // Prevent form submission if images are not cropped
+    document.getElementById('bookForm').addEventListener('submit', (event) => {
+        if (!document.getElementById('uploadCover').files.length || 
+            !document.getElementById('uploadBack').files.length || 
+            !document.getElementById('uploadContent').files.length) {
+            event.preventDefault();
+            alert('Please crop all the images before submitting.');
+        }
+    });
+</script>
+
+
+</body>
+</html>

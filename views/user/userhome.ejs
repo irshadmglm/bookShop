@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <%- include('../partials/userHeader') %>
+  <%- include('../partials/userSidebar') %>
+  
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Book Store</title>
+      <style>
+          body {
+              font-family: Arial, sans-serif;
+              margin-left: 180px;
+          }
+          .book-container {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 20px;
+              margin-left: 150px;
+              margin-top: 10px;
+          }
+          .book-card {
+              background-color: white;
+              width: 18%;
+              border-radius: 8px;
+              padding: 3px;
+             
+              transition: transform 0.2s ease-in-out;
+          }
+          .book-card:hover {
+              transform: translateY(-10px);
+          }
+          .book-card img {
+              width: 140px;
+              height: auto;
+              border-radius: 4px;
+              box-shadow: 0 3px 5px rgba(0, 0, 0, 0.6);
+          }
+          .book-title {
+              font-size: 14px;
+              font-weight: bold;
+              margin: 5px 0;
+          }
+          .book-author {
+              color: gray;
+              font-size: 12px;
+              margin-bottom: 4px;
+          }
+          .price {
+              margin: 5px 0;
+          }
+          .price .current-price {
+              font-size: 16px;
+              font-weight: bold;
+              color: #4CAF50;
+          }
+          .price .original-price {
+              text-decoration: line-through;
+              margin-left: 10px;
+              color: gray;
+          }
+          .discount {
+              color: #FF5722;
+              font-size: 12px;
+          }
+          .rating {
+              display: inline-block;
+              background-color: #4CAF50;
+              color: white;
+              padding: 2px 5px;
+              border-radius: 5px;
+              font-size: 12px;
+          }
+          .free-delivery {
+              margin-top: 10px;
+              color: #4CAF50;
+              font-size: 12px;
+          }
+          .separator-line {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 10px 0 0;
+        }
+
+      </style>
+  </head>
+  <body>
+  
+ 
+         
+      <%- include('../partials/breadcrumb', { breadcrumbs: breadcrumbs }) %>  
+
+    <div class="book-container">
+         <% books.forEach(function(book) { %>
+            <div class="book-card" data-id="<%= book._id %>">
+                <img src="images/uploads/<%= book.bookDetails.coverImageName %>" alt="Book Cover">
+                <div class="book-title"><%= book.bookDetails.book_name || ''  %></div>
+                <div class="book-author"><%= book.bookDetails.author_name || ''   %></div>
+                <div class="rating"><%= book.average_rating || ''  %>★</div>
+                <div class="price">
+                    <span class="current-price">₹<%= book.bookDetails.price || ''  %></span>
+                    <span class="original-price">₹<%= book.bookDetails.price || ''  %></span>
+                </div>
+                <div class="discount"><%= book.bookDetails.discount || ''  %> off</div>
+                <div class="free-delivery">free delivery</div>
+                <hr class="separator-line">
+            </div>
+        <% }); %>
+   </div>
+  <%- include('../partials/footer') %>
+  <script>
+       document.querySelectorAll('.book-card').forEach(bookcard => {
+            bookcard.addEventListener('click', function() {
+              const bookId = this.getAttribute('data-id');
+                if (bookId) {
+                    window.location.href = `/userbook/view-book?bookId=${bookId}`;
+                }
+            });
+        });
+  </script>
+  </body>
+  </html>
+  
+</body>
+</html>

@@ -1,0 +1,42 @@
+<style>
+    .breadcrumb {
+        margin-top: 100px;
+  padding: 10px 15px;
+  border-radius: 5px;
+  margin-left: 75px;
+}
+
+.breadcrumb-item {
+  display: inline;
+  font-size: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.breadcrumb-item a {
+  color: #404f60;
+  text-decoration: none;
+}
+.breadcrumb-item a:hover {
+  color: #0654ad;
+  text-decoration: none;
+}
+
+.breadcrumb-item.active {
+  color: #04559d;
+}
+
+</style>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <% breadcrumbs.forEach((breadcrumb, index) => { %>
+      <% if (index === breadcrumbs.length - 1) { %>
+        <li class="breadcrumb-item active" aria-current="page"><%= breadcrumb.name %></li>
+      <% } else { %>
+        <li class="breadcrumb-item">
+          <a href="<%= breadcrumb.url %>"><%= breadcrumb.name %></a> >
+        </li>
+      <% } %>
+    <% }) %>
+  </ol>
+</nav>
