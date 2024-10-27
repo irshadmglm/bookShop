@@ -124,9 +124,11 @@ router.get('/auth/google/callback', passport.authenticate('google', {
     }
 );
 
-router.get('/user-info',(req,res)=>{
-    userHelper.userAddress(req.session.user.Id).then((address)=>{
-        res.render('user/userhome',{address:address,user:req.session.user})
+router.get('/profile',(req,res)=>{
+    userHelper.userAddress(req.session.user._id).then((address)=>{
+        console.log(address);
+        
+        res.render('user/userinfo',{address:address,user:req.session.user})
     }).catch((err)=>{
         console.log(err);
         res.redirect('/');
@@ -137,26 +139,50 @@ router.get('/edit-user',(req,res)=>{
     res.render('user/editUser',{user:req.session.user});
 });
 
-router.post('/adit-user',(req,res)=>{
-    userHelper.apdateUser(req.body).then(()=>{
-        res.redirect('/user-info');
-    }).catch((error)=>{
-        console.log(error);
+router.post('/edit-user',(req,res)=>{
+    userHelper.editUser(req.body,req.session.user._id).then((response)=>{
+        console.log(response);
+        req.session.user = response;
+        
+        res.redirect('/profile');
+    }).catch((err)=>{
+        console.log(err);
         res.redirect('/edit-user');
         
     })
 })
+router.get('/add-address',(req,res)=>{
+    res.render('user/addAddress');
+})
+router.post('/add-address',(req,res)=>{
+    userHelper.addAddress(req.body,req.session.user._id).then(()=>{
+        res.redirect('/profile');
+    }).catch((err)=>{
+        console.log(err);
+        res.redirect('/add-address');
+    })
+})
 router.get('/edit-address',(req,res)=>{
-    userHelper.getOneAddress(req.query.addressId,req.session.user._id).then((address)=>{
+    userHelper.getOneAddress(req.query.addressId).then((address)=>{
+        console.log(address) ;
     res.render('user/editAddress',{address:address});
+    }).catch((err)=>{
+        console.log(err);
+        res.redirect('/profile');
     })
 })
 router.post('/edit-address',(req,res)=>{
-    userHelper.editAddress(req.body,req.session.user._id).then(()=>{
-        res.redirect("/user-info");
+    userHelper.editAddress(req.body).then(()=>{
+        res.redirect("/profile");
     }).catch((err)=>{
         console.log(err);
         res.redirect('/edit-address');
+    })
+})
+
+router.get('/delete-address',(req,res)=>{
+    userHelper.deleteAddress(req.query.addressId).then(()=>{
+        res.redirect('/profile');
     })
 })
 
@@ -199,6 +225,20 @@ router.post('/reset-password', async (req, res) => {
     await userHelper.updatePassword(email,hashedPassword,token);
     console.log('Password has been reset successfully');
     res.render('user/success');
+});
+
+router.get('/change-password',(req,res)=>{
+    res.render('user/changePassword');
+})
+router.post('/change-password', (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    userHelper.changePassword(currentPassword, newPassword, req.session.user._id)
+        .then((response) => {
+            res.status(200).json({ message: response, success: true });
+        })
+        .catch((error) => {
+            res.status(500).json({ message: error.message, success: false });
+        });
 });
 
 

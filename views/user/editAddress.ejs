@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Edit Form</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .container {
+            margin-top: 120px;
+            margin-bottom: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-container {
+            width: 500px;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .profile-icon {
+            font-size: 80px;
+            color: #333;
+            margin: 0 auto 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .form-field {
+            flex: 1 1 48%;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .form-field label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .form-field input {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid #333;
+            padding: 6px 0;
+            background-color: transparent;
+            font-size: 14px;
+            color: #333;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-field input:focus {
+            border-bottom-color: #ffb400;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .button {
+            width: 48%;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cancel-button {
+            background-color: #5a4c2e;
+            color: #fff;
+        }
+
+        .save-button {
+            background-color: #ffb400;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/userHeader') %>
+    <%- include('../partials/usersSidebar') %>
+    <div class="container">
+        <div class="form-container">
+            <!-- Profile Icon -->
+            <div class="profile-icon">
+                <i class="fas fa-address-card"></i>
+            </div>
+
+            <!-- Profile Edit Form -->
+            <form action="/edit-address" method="post">
+                <div class="form-group">
+                    <input type="hidden" name="address_id" value="<%= address._id %>">
+                    <div class="form-field">
+                        <input type="text" id="house_number" name="house_number" value="<%= address.address.house_number || ''%>">
+                    </div>
+                    <div class="form-field">
+                        <input type="text" id="street_address" name="street_address" value="<%= address.address.street_address || '' %>">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-field">
+                        <input type="text" id="city" name="city" value="<%= address.address.city || ''%>">
+                    </div>
+                    <div class="form-field">
+                        <input type="text" id="district" name="district" value="<%= address.address.district || '' %>">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-field">
+                        <input type="text" id="state" name="state" value="<%= address.address.state || '' %>">
+                    </div>
+                    <div class="form-field">
+                        <input type="text" id="pincode" name="pincode" value="<%= address.address.pincode || '' %>">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-field">
+                        <input type="text" id="phone" name="phone" value="<%= address.address.phone || '' %>">
+                    </div>
+                    <div class="form-field">
+                        <input type="email" id="email" name="email" value="<%= address.address.email || '' %>">
+                    </div>
+                   
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="button cancel-button">Cancel</button>
+                    <button type="submit" class="button save-button">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <%- include('../partials/footer') %>
+    <script>
+        document.querySelector('.cancel-button').addEventListener('click', () => {
+      window.history.back();
+  });
+      </script>
+    
+</body>
+</html>

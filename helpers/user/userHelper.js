@@ -91,10 +91,10 @@ module.exports = {
       }
     })
   },
-  addAddress:(address, userId)=>{
-    return new Promise(async(resolve,reject)=>{
+  addAddress: (address,userId) => {
+    return new Promise(async (resolve, reject) => {
       try {
-        await db.get().collection(collections.ADDRESS_COLLECTION).insertOne({user_id:userId, address:address,added_at: new Date().toISOString()});
+        await db.get().collection(collections.ADDRESS_COLLECTION).insertOne({ user_id: new ObjectId(userId), address: address, added_at: new Date().toISOString() });
         resolve();
       } catch (error) {
         reject(error);
@@ -102,78 +102,165 @@ module.exports = {
     })
   },
   userAddress: (userId) => {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
-       let address = await db.get().collection(collections.ADDRESS_COLLECTION).find({user_id: new ObjectId(userId)}).toArray();
+        let address = await db.get().collection(collections.ADDRESS_COLLECTION).find({ user_id: new ObjectId(userId) }).toArray();
+        console.log(address);
+        resolve(address)
+      } catch (error) {
+        reject(error)
+      }
+    })
+  },
+  editAddress:(address)=>{
+    return new Promise(async(resolve,reject)=>{
+      try {
+       await db.get().collection(collections.ADDRESS_COLLECTION).updateOne({_id: new ObjectId(address.address_id)},{$set:{address:address, updated_at: new Date().toISOString()}});
        resolve()
       } catch (error) {
         reject(error)
       }
     })
   },
-  getUser:(email)=>{
+  getOneAddress:(addressId)=>{
     return new Promise(async(resolve,reject)=>{
       try {
-      const user = await db.get().collection(collections.USER_COLLECTION).findOne({email:email});
-      resolve(user);
+        let address = await db.get().collection(collections.ADDRESS_COLLECTION).findOne({_id: new ObjectId(addressId)});
+        resolve(address);
       } catch (error) {
-       reject(error);
+        reject(error);
       }
     })
   },
-  addPasswordResets:(email,token,expiration)=>{
-    return new Promise((resolve,reject)=>{
+  deleteAddress:(addressId)=>{
+    return new Promise(async(resolve,reject)=>{
       try {
-        db.get().collection(collections.PASSWORD_RESETS_COLLECTION).insertOne({email,token,expiration})
+        await db.get().collection(collections.ADDRESS_COLLECTION).deleteOne({_id: new ObjectId(addressId)});
+      resolve();
+      } catch (error) {
+        reject(error);
+      }
+    })
+  },
+  getUser: (email) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const user = await db.get().collection(collections.USER_COLLECTION).findOne({ email: email });
+        resolve(user);
+      } catch (error) {
+        reject(error);
+      }
+    })
+  },
+  editUser: (userData, userId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const updateFields = {};
+            for (const key in userData) {
+                if (userData[key]) {
+                    updateFields[key] = userData[key];
+                }
+            }
+            if (Object.keys(updateFields).length === 0) {
+                 reject({ message: 'No fields to update' });
+            }
+            console.log(updateFields);
+            
+           await db.get().collection(collections.USER_COLLECTION)
+                .updateOne({ _id: new ObjectId(userId) }, { $set: updateFields });
+            const response = await db.get().collection(collections.USER_COLLECTION)
+                .findOne({ _id: new ObjectId(userId) });
+            console.log(response);
+            
+            resolve(response);
+
+        } catch (error) {
+            reject(error);
+        }
+    });
+},
+  addPasswordResets: (email, token, expiration) => {
+    return new Promise((resolve, reject) => {
+      try {
+        db.get().collection(collections.PASSWORD_RESETS_COLLECTION).insertOne({ email, token, expiration })
         resolve()
       } catch (error) {
         reject(error)
       }
     })
   },
-  sendResetEmail:(to,link)=>{
+  sendResetEmail: (to, link) => {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-          user: 'irshadmglm@gmail.com',
-            pass: 'sxlo urjf soxg bgor'
+        user: 'irshadmglm@gmail.com',
+        pass: 'sxlo urjf soxg bgor'
       }
-  });
+    });
 
-  const mailOptions = {
+    const mailOptions = {
       from: 'irshadmglm@gmail.com',
       to: to,
       subject: 'Password Reset Request',
       html: `<p>Click the link below to reset your password:</p><a href="${link}">Reset Password</a>`
-  };
+    };
 
-  transporter.sendMail(mailOptions, (error, info) => {
+    transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-          console.error('Error sending email:', error);
+        console.error('Error sending email:', error);
       } else {
-          console.log('Email sent:', info.response);
+        console.log('Email sent:', info.response);
       }
-  });
+    });
   },
-  getPasswordResets:(token)=>{
-    return new Promise(async(resolve,reject)=>{
+  getPasswordResets: (token) => {
+    return new Promise(async (resolve, reject) => {
       try {
-       let resetRequest = await db.get().collection(collections.PASSWORD_RESETS_COLLECTION).findOne({token:token});
-       resolve(resetRequest);
+        let resetRequest = await db.get().collection(collections.PASSWORD_RESETS_COLLECTION).findOne({ token: token });
+        resolve(resetRequest);
       } catch (error) {
         reject(error)
       }
     })
   },
-  updatePassword:(email,password,token)=>{
+  updatePassword: (email, password, token) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await db.get().collection(collections.USER_COLLECTION).updateOne({ email: email }, { $set: { password: password } });
+        await db.get().collection(collections.PASSWORD_RESETS_COLLECTION).deleteOne({ token: token })
+        resolve()
+      } catch (error) {
+        reject(error);
+      }
+    })
+  },
+  changePassword:(currentPassword,newPassword,userId)=>{
     return new Promise(async(resolve,reject)=>{
-   try {
-    await db.get().collection(collections.USER_COLLECTION).updateOne({ email:email }, { $set: { password:password } });
-    await db.get().collection(collections.PASSWORD_RESETS_COLLECTION).deleteOne({token:token})
-    resolve()
-   } catch (error) {
-    reject(error);
-   }
+      try {
+        console.log(userId);
+        
+        const user = await db.get().collection(collections.USER_COLLECTION).findOne({ _id: new ObjectId(userId) });
+        
+        if (!user) {
+            throw new Error("User not found.");
+        }
+        
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        
+        if (!isMatch) {
+            throw new Error("Incorrect current password. Please try again.");
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await db.get().collection(collections.USER_COLLECTION).updateOne(
+            { _id: new ObjectId(userId) },
+            { $set: { password: hashedPassword } }
+        );
+
+         resolve('Your password has been updated successfully.')
+    } catch (error) {
+       reject(error)
+    }
     })
   }
 }
