@@ -5,5 +5,6 @@ module.exports = {
     CATEGORIES_COLLECTION : 'categories',
     RATING_COLLECTION : 'rating',
     ADDRESS_COLLECTION : 'address',
-    PASSWORD_RESETS_COLLECTION : 'passwordResets'
+    PASSWORD_RESETS_COLLECTION : 'passwordResets',
+    USER_CART_COLLECTION : 'userCart'
 }

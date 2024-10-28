@@ -30,6 +30,7 @@ const adminRouter = require("./routes/admin/adminRoutes");
 const bookRouter = require('./routes/admin/bookRoutes');
 const userManagement = require('./routes/admin/userManagementRoutes');
 const userViewBook = require('./routes/user/userBooksRoutes')
+const userCart = require('./routes/user/cartRouter');
 
 
 app.set("view engine", "ejs");
@@ -44,5 +45,6 @@ db.connect((err) => {
  app.use('/books', bookRouter);
  app.use('/user-management',userManagement);
  app.use('/userbook',userViewBook);
+ app.use('/user-cart', userCart);
 
 app.listen(port,()=> console.log(`server is running on port ${port}`));
