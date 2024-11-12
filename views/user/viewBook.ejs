@@ -529,7 +529,7 @@
 
                                     <div class="buttons">
                                         <button value="<%= book._id %>" class="add-to-cart">Add to cart</button>
-                                        <button class="buy-now">Buy now</button>
+                                        <button value="<%= book._id %>" class="buy-now">Buy now</button>
                                     </div>
                     </div>
                 </div>
@@ -791,10 +791,19 @@
                             })
                             .catch(error => {
                                 console.error('Error:', error);
-                                showToast('Failed to add item to cart.');
+                                showToast(error || 'Failed to add item to cart.');
                             });
                     });
 
+
+                    document.querySelector('.buy-now').addEventListener('click', (event) =>{
+                        const selectedbookId =  event.target.value;
+                        console.log(selectedbookId);
+                        
+                    if (selectedbookId) {
+                        window.location.href = `/order/direct-check-out?bookId=${selectedbookId}`;
+                    }
+                    })
                     function showToast(message) {
                         const toast = document.createElement('div');
                         toast.className = 'toast';

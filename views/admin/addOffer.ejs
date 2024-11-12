@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Offer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .container {
+            margin: 120px auto 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-icon {
+            font-size: 80px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group, .offer-type {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-field {
+            flex: 1 1 48%;
+            font-size: 14px;
+        }
+
+        .form-field label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .form-field input,
+        .form-field textarea,
+        .form-field select {
+            width: 100%;
+            padding: 6px;
+            border: none;
+            border-bottom: 1px solid #333;
+            background-color: transparent;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-field input:focus,
+        .form-field textarea:focus,
+        .form-field select:focus {
+            border-bottom-color: #ffb400;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .button {
+            width: 48%;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cancel-button {
+            background-color: #5a4c2e;
+            color: #fff;
+        }
+
+        .save-button {
+            background-color: #ffb400;
+            color: #fff;
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/sidebar') %>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="form-container">
+            <!-- Form Icon -->
+            <div class="form-icon">
+                <i class="fas fa-tags"></i>
+            </div>
+            <form action="/offer-management/add-offer" method="post">
+                <!-- Offer Type Selection -->
+                <div class="offer-type">
+                    <label>
+                        <input type="radio" name="offerType" value="Product" checked onchange="toggleFields()"> Product Offer
+                    </label>
+                    <label>
+                        <input type="radio" name="offerType" value="Category" onchange="toggleFields()"> Category Offer
+                    </label>
+                    <label>
+                        <input type="radio" name="offerType" value="Referral" onchange="toggleFields()"> Referral Offer
+                    </label>
+                </div>
+
+                <!-- Add Offer Form -->
+                <div class="form-group">
+                    <!-- Offer Title -->
+                    <div class="form-field">
+                        <label for="offerTitle">Offer Title</label>
+                        <input type="text" id="offerTitle" name="offerTitle" placeholder="Enter offer title" required>
+                    </div>
+
+                    <!-- Discount Percentage -->
+                    <div class="form-field" id="discountField">
+                        <label for="discount">Discount (%)</label>
+                        <input type="number" id="discount" name="discount" placeholder="Discount percentage" min="0" max="100" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <!-- Category (Visible for Category Offer) -->
+                    <div class="form-field hidden" id="categoryField">
+                        <label for="category">Category</label>
+                        <select id="category" name="category">
+                            <option value="">Select category</option>
+                         <% categories.forEach(category => { %>
+                            <option value="<%= category._id %>"><%= category.categoryData.categoryName %></option>
+                         <% }) %>
+                        </select>
+                    </div>
+
+                    <div class="form-field hidden" id="productField">
+                        <label for="product">Product</label>
+                        <input type="text" id="product" name="product" placeholder="Enter product ID or name" >
+                    </div>
+
+                    <!-- Status -->
+                    <div class="form-field">
+                        <label for="status">Status</label>
+                        <select id="status" name="status" required>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="form-field">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="3" placeholder="Enter offer description" required></textarea>
+                </div>
+
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button type="button" class="button cancel-button" onclick="history.back()">Cancel</button>
+                    <button type="submit" class="button save-button">Add Offer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <%- include('../partials/footer') %>
+
+    <!-- JavaScript for Dynamic Fields -->
+    <script>
+        function toggleFields() {
+            const offerType = document.querySelector('input[name="offerType"]:checked').value;
+            const categoryField = document.getElementById('categoryField');
+            const discountField = document.getElementById('discountField');
+            
+            if (offerType === "Product") {
+                productField.classList.remove('hidden');
+                categoryField.classList.add('hidden');
+                discountField.classList.remove('hidden');
+            } else if (offerType === "Category") {
+                productField.classList.add('hidden');
+                categoryField.classList.remove('hidden');
+                discountField.classList.remove('hidden');
+            } else { 
+                productField.classList.add('hidden');
+                categoryField.classList.add('hidden');
+                discountField.classList.add('hidden');
+            }
+        }
+        
+        document.addEventListener("DOMContentLoaded", toggleFields);
+    </script>
+</body>
+</html>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* General Styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            margin: 120px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-around;
+            gap: 20px;
+        }
+
+        /* Left Column */
+        .left-column {
+            flex: 2;
+        }
+
+        .section {
+            background-color: #fff9e6;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .address-option {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            font-size: 16px;
+            color: #555;
+            position: relative;
+        }
+
+        .address-option label {
+            font-weight: bold;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        .address-info {
+            font-size: 14px;
+            color: #666;
+            margin-left: 28px;
+        }
+
+        .edit-btn {
+            background-color: transparent;
+            border: none;
+            color: #007bff;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        .add-address-btn {
+            color: #007bff;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 10px;
+            display: block;
+        }
+
+        /* Right Column - Price Details */
+        .right-column {
+            flex: 1;
+            background-color: #fff7e0;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .price-details {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 15px;
+            color: #555;
+        }
+
+        .total {
+            font-weight: bold;
+            font-size: 18px;
+            color: #f89a02;
+        }
+
+        .savings {
+            color: green;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .place-order-btn {
+            background-color: #ffb400;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            margin-top: 20px;
+        }
+
+        /* Form Styling */
+        .form-container {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-field {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .form-field input {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid #333;
+            padding: 6px 0;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .button {
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cancel-button {
+            background-color: #5a4c2e;
+            color: #fff;
+            margin-right: 10px;
+        }
+
+        .save-button {
+            background-color: #ffb400;
+            color: #fff;
+        }
+
+        .info-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #ffbe69;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .info-group {
+            flex-grow: 1;
+            padding-right: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #333;
+            margin: 5px 0;
+        }
+
+        .info-item.header {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .info-item i {
+            margin-right: 8px;
+            color: #fcc981;
+        }
+
+        .info-item.address-line {
+            font-size: 13px;
+        }
+
+        .info-item.contact {
+            font-size: 13px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: #fcb23b;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .icon-btn:hover {
+            color: #522d09;
+        }
+        /* Checkout Form Styling */
+#checkout-form {
+    background-color: #fff9e6;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+}
+
+#checkout-form label {
+    display: block;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+#checkout-form input[type="radio"] {
+    margin-right: 10px;
+}
+
+#checkout-form .radio-label {
+    font-size: 15px;
+    color: #555;
+    display: inline-block;
+    margin-right: 15px;
+}
+
+#checkout-form button[type="submit"] {
+    background-color: #ffb400;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    width: 100%;
+    margin-top: 15px;
+    text-align: center;
+    transition: background-color 0.3s;
+}
+
+#checkout-form button[type="submit"]:hover {
+    background-color: #f89a02;
+}
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Left Column -->
+        <div class="left-column">
+            <!-- Delivery Address Section -->
+            <div class="section address-section">
+                <div id="addressList" class="section-title">Delivery address</div>
+                  <% address.forEach((data)=> { %>
+                    <div class="info-container">
+                        <div class="info-group">
+
+                            <div class="info-item address-line">
+                                <i class="fas fa-home"></i>
+                                <span>
+                                    <%= data.address.house_number %>, <%= data.address.street_address %>
+                                </span>
+                            </div>
+
+                            <div class="info-item address-line">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>
+                                    <%= data.address.city %>, <%= data.address.district %>, <%= data.address.state %> -
+                                                <%= data.address.pincode %>
+                                </span>
+                            </div>
+
+                            <div class="info-item contact">
+                                <i class="fas fa-phone"></i>
+                                <span>
+                                    <%= data.address.phone %>
+                                </span>
+                            </div>
+
+                            <div class="info-item contact">
+                                <i class="fas fa-envelope"></i>
+                                <span>
+                                    <%= data.address.email %>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <input type="radio" id="address<%= data._id %>" name="address" value="<%= data._id %>" required>
+
+                            <button data-address='<%= JSON.stringify(data) %>' class="icon-btn edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <% }) %>
+
+
+                        <div class="add-address-btn">+ Add Address</div>
+
+                        <!-- Address Form -->
+                        <div class="form-container">
+                             <form id="addressForm">
+                        <div class="form-group">
+                            <div class="form-field">
+                                <input type="text" name="address_id" value="0" hidden>
+                                <input type="text" name="house_number" placeholder="House Number" required>
+                            </div>
+                            <div class="form-field">
+                                <input type="text" name="street_address" placeholder="Street Address" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-field">
+                                <input type="text" name="city" placeholder="City" required>
+                            </div>
+                            <div class="form-field">
+                                <input type="text" name="district" placeholder="District" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-field">
+                                <input type="text" name="state" placeholder="State" required>
+                            </div>
+                            <div class="form-field">
+                                <input type="text" name="pincode" placeholder="PIN Code" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-field">
+                                <input type="text" name="phone" placeholder="Contact Number" required>
+                            </div>
+                            <div class="form-field">
+                                <input type="email" name="email" placeholder="Email" required>
+                            </div>
+                        </div>
+                        <div class="button-group">
+                            <button type="button" class="button cancel-button">Cancel</button>
+                            <button type="submit" class="button save-button">Save</button>
+                        </div>
+                    </form>
+                        </div>
+                        <input type="text" id="bookId" value="<%= bookId %>" hidden>
+            </div>
+            <form id="checkout-form">
+                <!-- Payment Method Selection -->
+                <div class="section-title">Select Payment Method</div>
+                <label>
+                    <input type="radio" name="paymentMethod" value="online" required> Online Payment
+                </label>
+                <label>
+                    <input type="radio" name="paymentMethod" value="cod" required> Cash on Delivery (COD)
+                </label>
+
+                <!-- Place Order Button -->
+            </form>
+        </div>
+
+        <!-- Right Column - Price Details Section -->
+        <div class="right-column">
+            <div class="section">
+                <div class="section-title">Price Details</div>
+                <div class="price-details">
+                    <div class="item">
+                        <span>Price</span>
+                        <span><%= totalPrice %>/-</span>
+                    </div>
+                    <div class="item">
+                        <span>Delivery Charges</span>
+                        <span>0</span>
+                    </div>
+                    <div class="item">
+                        <span>Discount</span>
+                        <span style="color: green;">0</span>
+                    </div>
+                    <div class="item total">
+                        <span>Sub Total</span>
+                        <span><%= totalPrice %></span>
+                    </div>
+                </div>
+                <button class="place-order-btn">Place Order</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        let addressData;
+        document.querySelector('.add-address-btn').onclick = () => {
+            document.querySelector('.form-container').style.display = 'block';
+        };
+
+        document.querySelector('.cancel-button').onclick = () => {
+            document.querySelector('.form-container').style.display = 'none';
+        };
+
+        document.getElementById('addressForm').onsubmit = function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+             addressData = {
+                house_number: formData.get('house_number'),
+                street_address: formData.get('street_address'),
+                city: formData.get('city'),
+                district: formData.get('district'),
+                state: formData.get('state'),
+                pincode: formData.get('pincode'),
+                phone: formData.get('phone'),
+                email: formData.get('email')
+            };
+
+            addAddressToDOM(addressData);
+            document.querySelector('.form-container').style.display = 'none';
+            event.target.reset();
+        };
+
+        function addAddressToDOM(data) {
+            const addressList = document.getElementById('addressList');
+            const addressDiv = document.createElement('div');
+            addressDiv.classList.add('info-container');
+            addressDiv.innerHTML = `
+                <div class="info-group">
+            <div class="info-item address-line"><i class="fas fa-home"></i> ${data.house_number}, ${data.street_address}</div>
+            <div class="info-item address-line"><i class="fas fa-map-marker-alt"></i> ${data.city}, ${data.district}, ${data.state} - ${data.pincode}</div>
+            <div class="info-item contact"><i class="fas fa-phone"></i> ${data.phone}</div>
+            <div class="info-item contact"><i class="fas fa-envelope"></i> ${data.email}</div>
+        </div>
+            <input type="radio" name="address" value="${data._id}" required>
+
+            `;
+            addressList.appendChild(addressDiv);
+        }
+
+        document.querySelector('.place-order-btn').onclick = () => {
+    const selectedAddress = document.querySelector('input[name="address"]:checked');
+    const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
+    if (!selectedAddress) {
+        alert("Please select a delivery address before placing an order.");
+        return;
+    }
+    if(!selectedPaymentMethod){
+        alert("Please select Payment Method before placing an order.");
+        return;
+    }
+
+    const addressId = selectedAddress.value;
+    const paymentMethod = selectedPaymentMethod.value;
+    const bookId = document.getElementById('bookId').value;
+    
+    // Proceed with order submission, using `addressId`
+    alert(`Order will be placed for address ID: ${addressId}`);
+    console.log(addressData);
+    
+    $.ajax({
+            url: '/order/direct-check-out', 
+            method: 'post',
+            data: {
+        addressId: addressId,
+        addressData: addressData,
+        paymentMethod: paymentMethod,
+        bookId: bookId
+    },
+            success: function(data) {
+                console.log(data);
+                if (data.success) {
+                    console.log(data);
+                    alert('Order placed successfully!');
+                    window.location.href = `/user-cart`
+                  }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX error:', error);
+                alert('Error placing order. Please try again.');
+            }
+        });
+
+
+
+
+};
+
+
+document.querySelectorAll('.edit').forEach((button)=>{
+    button.addEventListener('click',function(){
+        const data = JSON.parse(button.getAttribute("data-address"));
+     console.log(data);
+     document.querySelector('.form-container').style.display = 'block';
+      document.querySelector('input[name="address_id"]').value = data._id;
+      document.querySelector('input[name="house_number"]').value = data.address.house_number;
+      document.querySelector('input[name="street_address"]').value = data.address.street_address;
+      document.querySelector('input[name="city"]').value = data.address.city;
+      document.querySelector('input[name="district"]').value = data.address.district;
+      document.querySelector('input[name="state"]').value = data.address.state;
+      document.querySelector('input[name="pincode"]').value = data.address.pincode;
+      document.querySelector('input[name="phone"]').value = data.address.phone;
+      document.querySelector('input[name="email"]').value = data.address.email;
+
+        
+    })
+})
+
+    </script>
+</body>
+
+</html>

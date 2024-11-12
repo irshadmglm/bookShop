@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Coupon Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .form-container {
+            width: 500px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-container h2 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #3b2402;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            color: #0d0c0c;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+            outline: none;
+        }
+        
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .button {
+            width: 48%;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .cancel-button {
+            background-color: #4a2909;
+        }
+
+        .save-button {
+            background-color: #ffb400;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/sidebar') %>
+
+<div class="form-container">
+    <form action="/coupon-management/add-coupon" method="post">
+        <div class="form-grid">
+            <div class="form-group">
+                <input type="text" id="coupon_code" name="coupon_code" hidden>
+                 <h2>Add Coupon</h2>
+
+            </div>
+            <div class="form-group">
+                <label for="discount_type">Discount Type</label>
+                <select id="discount_type" name="discount_type">
+                    <option value="percentage">Percentage</option>
+                    <option value="fixed_amount">Fixed Amount</option>
+                    <option value="free_shipping">Free Shipping</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="discount_value">Discount Value</label>
+                <input type="number" id="discount_value" name="discount_value" placeholder="Discount Value (e.g., 10 for 10%)">
+            </div>
+            <div class="form-group">
+                <label for="max_discount">Max Discount</label>
+                <input type="number" id="max_discount" name="max_discount" placeholder="Max Discount Amount">
+            </div>
+            <div class="form-group">
+                <label for="min_purchase">Minimum Purchase</label>
+                <input type="number" id="min_purchase" name="min_purchase" placeholder="Minimum Purchase Amount">
+            </div>
+            <div class="form-group">
+                <label for="valid_from">Valid From</label>
+                <input type="date" id="valid_from" name="valid_from">
+            </div>
+            <div class="form-group">
+                <label for="valid_to">Valid To</label>
+                <input type="date" id="valid_to" name="valid_to">
+            </div>
+            <div class="form-group">
+                <label for="usage_limit">Usage Limit</label>
+                <input type="number" id="usage_limit" name="usage_limit" placeholder="Total Usage Limit">
+            </div>
+            <div class="form-group">
+                <label for="per_user_limit">Per User Limit</label>
+                <input type="number" id="per_user_limit" name="per_user_limit" placeholder="Usage Limit Per User">
+            </div>
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button type="button" class="button cancel-button">Cancel</button>
+            <button type="submit" class="button save-button">Save</button>
+        </div>
+    </form>
+</div>
+
+
+<script>
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '#';
+    for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    document.getElementById('coupon_code').value = code ;
+</script>
+</body>
+</html>

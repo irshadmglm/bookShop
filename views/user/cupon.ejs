@@ -1,0 +1,212 @@
+
+<style>
+    * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.coupons-section {
+    max-width: 600px;
+    width: 100%;
+}
+
+.coupon-box {
+    margin-bottom: 20px;
+}
+
+.coupon-box h4 {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.coupon {
+    background-color: #FFF7E6;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.coupon:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.discount-details {
+    display: flex;
+    /* flex-direction: column; */
+    justify-content: space-between;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.discount {
+    font-size: 1.5em;
+    color: #28a745;
+    font-weight: bold;
+}
+
+.extra-details p {
+    font-size: 1em;
+    color: #555;
+    margin: 0;
+}
+
+.validity {
+    font-size: 0.9em;
+    color: #777;
+}
+
+.minimum-purchase {
+    font-size: 0.95em;
+    color: #555;
+    margin: 10px 0;
+}
+
+.expiry {
+    font-size: 0.85em;
+    color: #333;
+    text-align: right;
+    font-weight: 500;
+}
+
+.get-code-button {
+    padding: 10px;
+    background-color: #ffe367;
+    color: rgb(61, 3, 3);
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9em;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.get-code-button:hover {
+    background-color: #e1e1e1;
+}
+
+.copy-message {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ffdd56;
+    color: rgb(77, 40, 5);
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.show {
+    opacity: 1;
+}
+
+.divider {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 20px 0;
+}
+
+.upcoming {
+    background-color: #eeefed;
+}
+
+</style>
+<%- include('../partials/userHeader') %>
+<%- include('../partials/usersSidebar') %>
+<div class="coupons-section">
+    <div class="coupon-box available">
+        <h4>Available Coupons</h4>
+        <% coupons.forEach( coupon => {  %>
+            <% if( coupon.status === 'active' && new Date() > new Date(coupon.valid_from) ){  %>
+        <div class="coupon">
+            <div class="discount-details">
+                <div class="extra-details">
+                    <% if( coupon.discount_type === 'percentage'){  %>
+                <div class="discount"><%= coupon.discount_value ||' '%>% off</div>
+                <% } else{ %>
+                <div class="discount">Extra ₹<%= coupon.discount_value ||' '  %> Off</div>
+                    <% }%>
+                    <span class="validity"> Valid From <%= coupon.valid_from ||' '  %></span>
+                    <br>
+                     <div class="minimum-purchase">Valid on purchases over ₹<%= coupon.min_purchase ||' '  %></div>
+                </div>
+                <div>
+                    <div class="expiry">Valid till: <%= coupon.valid_to ||' '  %></div>
+                    <button class="get-code-button"  value="<%= coupon.coupon_code %>">Get Code</button>
+
+                </div>
+            </div>
+        </div>
+        <% }%>
+        <% }) %>
+    </div>
+
+    <hr class="divider">
+
+    <div class="coupon-box">
+        <h4>Upcoming Coupons</h4>
+        <% coupons.forEach( coupon => {  %>
+            <% if (new Date() < new Date(coupon.valid_from)) {  %>
+        <div class="coupon upcoming">
+            <div class="discount-details">
+                <div class="extra-details">
+                    <% if( coupon.discount_type === 'percentage'){  %>
+                <div class="discount"><%= coupon.discount_value ||' '%>% off</div>
+                <% } else{ %>
+                <div class="discount">Extra ₹<%= coupon.discount_value ||' '  %> Off</div>
+                    <% }%>
+                    <span class="validity"> Valid From <%= coupon.valid_from ||' '  %></span>
+                    <br>
+                     <div class="minimum-purchase">Valid on purchases over ₹<%= coupon.min_purchase ||' '  %></div>
+                </div>
+                <div>
+                    <div class="expiry">Valid till: <%= coupon.valid_to ||' '  %></div>
+
+                </div>
+            </div>
+        </div>
+        <% }%>
+        <% }) %>
+    </div>
+    
+    <!-- Notification message -->
+    <div id="copyMessage" class="copy-message">Coupon code copied!</div>
+</div>
+
+
+<script>
+    document.querySelectorAll('.get-code-button').forEach(button => {
+        button.addEventListener('click', (event) => {
+            let code = button.value;
+            navigator.clipboard.writeText(code).then(() => {
+                const message = document.getElementById("copyMessage");
+                message.classList.add("show");
+                setTimeout(() => {
+                    message.classList.remove("show");
+                }, 2000);
+            }).catch(err => {
+                console.error("Failed to copy text: ", err);
+            });
+        });
+    });
+</script>

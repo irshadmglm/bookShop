@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wishlist</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin-top: 130px;
+        }
+
+        .wishlist-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .wishlist-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: #fff9ef;
+            border-radius: 12px;
+            width: 600px;
+            margin: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .wishlist-item img {
+            width: 120px;
+            height: 150px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+
+        .wishlist-item-details {
+            flex: 1;
+            color: #333;
+        }
+
+        .wishlist-item-details p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .remove-btn {
+            background-color: #5c3804;
+            color: #fff;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .empty-wishlist-message {
+            background-color: #faedc9;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            font-size: 18px;
+            color: #16110e;
+            margin-top: 200px;
+            width: 300px;
+            margin-left: 600px;
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <%- include('../partials/userHeader') %>
+    <%- include('../partials/usersSidebar') %>
+
+    <% if (wishlist && wishlist.length > 0) { %>
+        <div class="wishlist-container">
+            <% wishlist.forEach((book) => { %>
+                <div class="wishlist-item">
+                    <!-- Product Image -->
+                    <img src="/images/uploads/<%= book.coverImageName || '' %>" alt="Product Image">
+
+                    <!-- Product Details -->
+                    <div class="wishlist-item-details">
+                        <p><strong>Title:</strong> <%= book.book_name || ' ' %></p>
+                        <p><strong>Author:</strong> <%= book.author_name || ' ' %></p>
+                        <p><strong>Price:</strong> <%= book.price || ' ' %></p>
+                        <p><strong>Category:</strong> <%= book.category || ' ' %></p>
+                        <p><strong> Stock:</strong> <%= book.stock || ' ' %></p>
+
+                    </div>
+
+                    <!-- Remove Button -->
+                    <button value="<%= book.bookId %>" class="remove-btn">Remove</button>
+                </div>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <!-- Empty wishlist message -->
+        <div class="empty-wishlist-message">
+            <h2><i class="fas fa-heart"></i></h2>
+            <h4>Your wishlist is currently empty.</h4>
+        </div>
+    <% } %>
+
+    <script>
+        document.querySelectorAll('.remove-btn').forEach((button) => {
+            button.addEventListener('click', (event) => {
+                const bookId = button.value;
+                const wishlistItem = button.closest('.wishlist-item');
+                fetch('/wish-list/remove-from-wishlist', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bookId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        wishlistItem.style.transition = "opacity 0.5s ease";
+                        wishlistItem.style.opacity = 0;
+                        setTimeout(() => {
+                            wishlistItem.remove();
+                        }, 500);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    </script>
+</body>
+
+</html>

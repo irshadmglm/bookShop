@@ -94,8 +94,8 @@ module.exports = {
   addAddress: (address,userId) => {
     return new Promise(async (resolve, reject) => {
       try {
-        await db.get().collection(collections.ADDRESS_COLLECTION).insertOne({ user_id: new ObjectId(userId), address: address, added_at: new Date().toISOString() });
-        resolve();
+       let response = await db.get().collection(collections.ADDRESS_COLLECTION).insertOne({ user_id: new ObjectId(userId), address: address, added_at: new Date().toISOString() });
+        resolve(response.insertedId);
       } catch (error) {
         reject(error);
       }
@@ -112,7 +112,7 @@ module.exports = {
       }
     })
   },
-  editAddress:(address)=>{
+  editAddress:function(address){
     return new Promise(async(resolve,reject)=>{
       try {
        await db.get().collection(collections.ADDRESS_COLLECTION).updateOne({_id: new ObjectId(address.address_id)},{$set:{address:address, updated_at: new Date().toISOString()}});

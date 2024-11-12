@@ -18,12 +18,14 @@
         body {
             font-family: Arial, sans-serif;
             color: #333;
+             background-color: #fff9e5;
+
         }
 
         /* Container for the catalog */
         .container {
             max-width: 1200px;
-            margin-left: 280px ;
+            margin-left: 280px;
             padding: 20px;
         }
 
@@ -90,10 +92,11 @@
         }
 
         .book-table thead {
-            background-color:  #fcecc3;
+            background-color: #ffe39e;
         }
 
-        .book-table th, .book-table td {
+        .book-table th,
+        .book-table td {
             padding: 12px 15px;
             border-bottom: 1px solid #ddd;
         }
@@ -126,51 +129,55 @@
         .icon-btn:hover {
             color: #5b2a0a;
         }
+
         /* Sort container styling */
-.sort {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    gap: 10px; /* Space between label and dropdown */
-}
+        .sort {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+            /* Space between label and dropdown */
+        }
 
-/* Label styling */
-.sort-label {
-    font-size: 16px;
-    color: #333;
-    font-weight: bold;
-    margin-right: 10px;
-}
+        /* Label styling */
+        .sort-label {
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+            margin-right: 10px;
+        }
 
-/* Dropdown styling */
-.sort-select {
-    padding: 10px 15px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    color: #333;
-    cursor: pointer;
-    appearance: none; /* Removes default arrow */
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="%23333"%3E%3Cpath d="M2 2l3 3 3-3z"/%3E%3C/svg%3E');
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 12px;
-    width: 100%;
-    max-width: 250px; /* Adjust width based on your layout */
-}
+        /* Dropdown styling */
+        .sort-select {
+            padding: 10px 15px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            color: #333;
+            cursor: pointer;
+            appearance: none;
+            /* Removes default arrow */
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="%23333"%3E%3Cpath d="M2 2l3 3 3-3z"/%3E%3C/svg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 12px;
+            width: 100%;
+            max-width: 250px;
+            /* Adjust width based on your layout */
+        }
 
-/* Hover effect */
-.sort-select:hover {
-    border-color: #f39c12;
-}
+        /* Hover effect */
+        .sort-select:hover {
+            border-color: #f39c12;
+        }
 
-/* Focus effect */
-.sort-select:focus {
-    outline: none;
-    border-color: #f39c12;
-    box-shadow: 0 0 5px rgba(243, 156, 18, 0.5);
-}
+        /* Focus effect */
+        .sort-select:focus {
+            outline: none;
+            border-color: #f39c12;
+            box-shadow: 0 0 5px rgba(243, 156, 18, 0.5);
+        }
 
         /* Footer styling */
         footer {
@@ -182,71 +189,111 @@
             font-size: 14px;
             color: #777;
         }
+
+        .in-stock {
+            color: green;
+        }
+
+        .out-of-stock {
+            color: red;
+        }
+                .copy-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #ffdd56;
+            color: rgb(77, 40, 5);
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .show {
+            opacity: 1;
+}
     </style>
 </head>
 
 <body>
+    
     <%- include('../partials/sidebar') %>
-    <!-- Main Content Container -->
-    <div class="container">
-        <div class="header">
-            <div class="sort">
-                <label for="category" class="sort-label">Sort by category:</label>
-                <select id="category" name="categoryId" class="sort-select">
-                    <option value="">Select</option>
-                    <option value="0">All</option>
-                    <% categories.forEach(category => { %>
-                    <option value="<%= category._id %>"><%= category.categoryData.categoryName %></option>
-                    <% }) %>
-                </select>
-            </div>
-            
+        <!-- Main Content Container -->
+        <div class="container">
+            <div class="header">
+                <div class="sort">
+                    <label for="category" class="sort-label">Sort by category:</label>
+                    <select id="category" name="categoryId" class="sort-select">
+                        <option value="">Select</option>
+                        <option value="0">All</option>
+                        <% categories.forEach(category=> { %>
+                            <option value="<%= category._id %>">
+                                <%= category.categoryData.categoryName %>
+                            </option>
+                            <% }) %>
+                    </select>
+                </div>
 
-            <!-- Search and Add Book Button -->
-            <div class="search">
-                <input type="text" placeholder="Search...">
-                <button class="search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
-                
-            </div>
-            
-            <div>
-                <!-- Deleted Books Button -->
-                <button class="add-book-btn" onclick="window.location.href='/books/deleted-book'">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            
-                <!-- Add Book Button -->
-                <button class="add-book-btn" onclick="window.location.href='/books/add-book'">
-                    <i class="fas fa-plus"></i> 
-                </button>
-            </div>
-            
-        </div>
 
-        <!-- Books Table -->
-        <table class="book-table">
-            <thead>
-                <tr>
-                    <th>Image</th>
-                    <th>Book Name</th>
-                    <th>Category</th>
-                    <th>Stock</th>
-                    <th>Price</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% books.forEach(book => { %>
+                <!-- Search and Add Book Button -->
+                <div class="search">
+                    <input type="text" placeholder="Search...">
+                    <button class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+
+                </div>
+
+                <div>
+                    <!-- Deleted Books Button -->
+                    <button class="add-book-btn" onclick="window.location.href='/books/deleted-book'">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+
+                    <!-- Add Book Button -->
+                    <button class="add-book-btn" onclick="window.location.href='/books/add-book'">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Books Table -->
+            <table class="book-table">
+                <thead>
                     <tr>
-                        <td><img src="images/uploads/<%= book.bookDetails.coverImageName %>" alt="Book Cover"></td>
-                        <td><%= book.bookDetails.book_name %></td>
-                        <td><%= book.bookDetails.categoryId %></td>
-                        <td><%= book.bookDetails.stock %></td>
-                        <td>&#8377; <%= book.bookDetails.price %></td>
-                        <td>
-                           <!-- Delete Button -->
+                        <th>Image</th>
+                        <th>Book Name</th>
+                        <th>Category</th>
+                        <th>Stock Level</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% books.forEach(book=> { %>
+                        <tr>
+                            <td><img src="images/uploads/<%= book.bookDetails.coverImageName %>" alt="Book Cover"></td>
+                            <td>
+                                <%= book.bookDetails.book_name %>
+                            </td>
+                            <td>
+                                <%= book.bookDetails.category %>
+                            </td>
+                            <td>
+                                <%= book.bookDetails.stock %>
+                            </td>
+                            <td>&#8377; <%= book.bookDetails.price %>
+                            </td>
+                            <td class="<%= book.bookDetails.stock > 0 ? 'in-stock' : 'out-of-stock' %>">
+                                <%= book.bookDetails.stock> 0 ? 'In Stock' : 'Out of Stock' %>
+                            </td>
+
+
+                            <td>
+                                <!-- Delete Button -->
                                 <button value="<%= book._id %>" class="icon-btn delete">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
@@ -260,54 +307,74 @@
                                 <button value="<%= book._id %>" class="icon-btn edit">
                                     <i class="fas fa-edit"></i>
                                 </button>
+                                <button class="get-code-button icon-btn"  value="<%= book._id %>">
+                                    <i class="fas fa-copy"></i>
+                                </button>
 
-                        </td>
-                    </tr>
-                <% }) %>
-            </tbody>
-        </table>
-    </div>
+                            </td>
+                        </tr>
+                        <% }) %>
+                </tbody>
+            </table>
+        </div>
+        <div id="copyMessage" class="copy-message">bookId copied!</div>
 
-    <!-- Footer -->
-    <%- include('../partials/footer') %>
+        <!-- Footer -->
+        <%- include('../partials/footer') %>
 
-    <script>
-        const categoryDropdown = document.getElementById('category');
-        categoryDropdown.addEventListener('change', function() {
-            const selectedCategoryId = this.value;
-            if (selectedCategoryId) {
-                window.location.href = `/books?categoryId=${selectedCategoryId}`;
-            }
-        });
+            <script>
+                const categoryDropdown = document.getElementById('category');
+                categoryDropdown.addEventListener('change', function () {
+                    const selectedCategoryId = this.value;
+                    if (selectedCategoryId) {
+                        window.location.href = `/books?categoryId=${selectedCategoryId}`;
+                    }
+                });
 
-        // Add Event Listeners for Edit, Delete, and View Buttons
-        document.querySelectorAll('.edit').forEach(button => {
-            button.addEventListener('click', function() {
-                const bookId = this.value;
-                if (bookId) {
-                    window.location.href = `/books/edit-book?bookId=${bookId}`;
-                }
+                // Add Event Listeners for Edit, Delete, and View Buttons
+                document.querySelectorAll('.edit').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const bookId = this.value;
+                        if (bookId) {
+                            window.location.href = `/books/edit-book?bookId=${bookId}`;
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.delete').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const bookId = this.value;
+                        if (bookId) {
+                            window.location.href = `/books/delete-book?bookId=${bookId}`;
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.view').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const bookId = this.value;
+                        if (bookId) {
+                            window.location.href = `/books/view-book?bookId=${bookId}`;
+                        }
+                    });
+                });
+
+
+                document.querySelectorAll('.get-code-button').forEach(button => {
+        button.addEventListener('click', (event) => {
+            let bookId = button.value;
+            navigator.clipboard.writeText(bookId).then(() => {
+                const message = document.getElementById("copyMessage");
+                message.classList.add("show");
+                setTimeout(() => {
+                    message.classList.remove("show");
+                }, 2000);
+            }).catch(err => {
+                console.error("Failed to copy text: ", err);
             });
         });
-
-        document.querySelectorAll('.delete').forEach(button => {
-            button.addEventListener('click', function() {
-                const bookId = this.value;
-                if (bookId) {
-                    window.location.href = `/books/delete-book?bookId=${bookId}`;
-                }
-            });
-        });
-
-        document.querySelectorAll('.view').forEach(button => {
-            button.addEventListener('click', function() {
-                const bookId = this.value;
-                if (bookId) {
-                    window.location.href = `/books/view-book?bookId=${bookId}`;
-                }
-            });
-        });
-    </script>
+    });
+            </script>
 </body>
 
 </html>

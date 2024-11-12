@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Coupon Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Basic reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling */
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        /* Container for the catalog */
+        .container {
+            max-width: 1200px;
+            margin-left: 280px;
+            padding: 20px;
+        }
+
+        /* Header section */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* Search bar */
+        .search {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .search input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+            width: 100%;
+        }
+
+        .search-btn {
+            background-color: #f39c12;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            font-size: 18px;
+            color: #fff;
+            border-radius: 4px;
+        }
+
+        /* Add Coupon Button */
+        .add-coupon-btn {
+            padding: 10px 16px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .add-coupon-btn:hover {
+            background-color: #45a049;
+        }
+
+        /* Coupon table styles */
+        .coupon-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .coupon-table thead {
+            background-color: #fcecc3;
+        }
+
+        .coupon-table th,
+        .coupon-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .coupon-table th {
+            font-weight: bold;
+            text-align: left;
+        }
+
+        /* Action buttons */
+        .icon-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            margin: 0 5px;
+            color: #fbcd82;
+        }
+
+        .icon-btn:hover {
+            color: #5b2a0a;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/sidebar') %>
+    <div class="container">
+        <div class="header">
+            <!-- Search and Add Coupon Button -->
+            <div class="search">
+                <input type="text" placeholder="Search coupons...">
+                <button class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <button class="add-coupon-btn" onclick="window.location.href='/coupon-management/add-coupon'">
+                <i class="fas fa-plus"></i> Add Coupon
+            </button>
+        </div>
+
+        <!-- Coupons Table -->
+        <table class="coupon-table">
+            <thead>
+                <tr>
+                    <th>Coupon Code</th>
+                    <th>Discount Type</th>
+                    <th>Discount</th>
+                    <th>Valid From</th>
+                    <th>Expiration Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% coupons.forEach(  coupon => { %>
+                    <tr>
+                        <td><%= coupon.coupon_code ||' '  %></td>
+                        <td><%= coupon.discount_type ||' '  %></td>
+                        <td><%= coupon.discount_value ||' ' %> % </td>
+                        <td><%= coupon.valid_from ||' ' %> </td>
+                        <td><%= coupon.valid_to ||' ' %></td>
+                        <td><%= coupon.status ||' ' %></td>
+                        <td>
+                            <!-- Delete Button -->
+                            <button value="<%= coupon._id %>" class="icon-btn delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                            
+                            <!-- Edit Button -->
+                            <button value="<%= coupon._id %>" class="icon-btn edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <% }) %>
+                
+            </tbody>
+        </table>
+    </div>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+        // Add Event Listeners for Edit and Delete Buttons
+        document.querySelectorAll('.edit').forEach(button => {
+            button.addEventListener('click', function () {
+                const couponId = this.value;
+                if (couponId) {
+                    window.location.href = `/coupons/edit-coupon?couponId=${couponId}`;
+                }
+            });
+        });
+
+        document.querySelectorAll('.delete').forEach(button => {
+            button.addEventListener('click', function () {
+                const couponId = this.value;
+                if (couponId) {
+                    window.location.href = `/coupons/delete-coupon?couponId=${couponId}`;
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

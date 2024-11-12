@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sidebar Design with Filters</title>
+    <title>Sidebar Design with Filters and Sorting</title>
     <!-- Include Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -31,10 +31,6 @@
             background-color: #ffe07a;
         }
 
-        /* .sidebar .menu-item.active {
-            background-color: #ffe07a;
-        } */
-
         .sidebar .menu-item i {
             margin-right: 10px;
             font-size: 14px;
@@ -43,7 +39,7 @@
 
         .sidebar .section-title {
             font-weight: bold;
-            font-size: 10px;
+            font-size: 12px;
             margin: 20px 0 10px;
             color: #333;
         }
@@ -65,7 +61,7 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 14px;
-            background-color: #f9f9f9;
+            background-color: #fdf0da;
         }
 
         .filter-section label {
@@ -85,6 +81,7 @@
             font-size: 14px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            margin-bottom: 10px;
         }
 
         .filter-section button:hover {
@@ -96,53 +93,13 @@
 <body>
 
 <div class="sidebar">
-    <!-- Main menu items -->
-    <div class="menu-item">
-        <i class="fas fa-th-large"></i>
-        <span>Dashboard</span>
-    </div>
-    <div class="divider"></div>
-    
-    <div class="section-title">MY ACCOUNT</div>
-    <div class="menu-item">
-        <i class="fas fa-user"></i>
-        <span>Address</span>
-    </div>
-    <div class="menu-item">
-        <i class="fas fa-ticket-alt"></i>
-        <span>Coupons</span>
-    </div>
-    <div class="menu-item active">
-        <i class="fas fa-history"></i>
-        <span>Order history</span>
-    </div>
-    <div class="menu-item">
-        <i class="fas fa-shopping-cart"></i>
-        <span>Shopping cart</span>
-    </div>
-    <div class="menu-item">
-        <i class="fas fa-wallet"></i>
-        <span>Wallet</span>
-    </div>
-    <div class="menu-item">
-        <i class="fas fa-heart"></i>
-        <span>Wish list</span>
-    </div>
-    <div class="menu-item">
-        <a href="http://localhost:3000/logout">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Log out</span>
-        </a>
-    </div>
-    
-
     <div class="divider"></div>
 
     <!-- Filter section -->
     <div class="filter-section">
-        <div class="section-title">FILTER BY</div>
-
-        <!-- Filter by Category -->
+        <div class="section-title">FILTER BY <i class="fas fa-filter"></i></div>
+        
+        <!-- Category Filter -->
         <label for="category-filter">Category</label>
         <select id="category-filter" name="category">
             <option value="">All Categories</option>
@@ -150,8 +107,8 @@
                 <option value="<%= category._id %>"><%= category.categoryData.categoryName %></option>
             <% }) %>
         </select>
-
-        <!-- Filter by Price -->
+    
+        <!-- Price Filter -->
         <label for="price-filter">Price</label>
         <select id="price-filter" name="price">
             <option value="">All Prices</option>
@@ -160,18 +117,125 @@
             <option value="101-200">$101 - $200</option>
             <option value="201+">$201 and above</option>
         </select>
-
-        <!-- Submit Button for Filters -->
-        <button onclick="applyFilters()" >Apply Filters</button>
+    
+        <!-- Sorting Options -->
+        <div class="section-title">SORT BY <i class="fas fa-sort"></i></div>
+        <label for="sort-filter">Sort</label>
+        <select id="sort-filter" name="sort">
+            <option value="">Select Sorting</option>
+            <option value="popularity" title="Sorts by popularity">Popularity</option>
+            <option value="price-low-high" title="Sorts by price: low to high">Price: Low to High</option>
+            <option value="price-high-low" title="Sorts by price: high to low">Price: High to Low</option>
+            <option value="average-ratings" title="Sorts by average ratings">Average Ratings</option>
+            <option value="featured" title="Highlights featured items">Featured</option>
+            <option value="in-stock" title="Show Only In Stock Products">In Stock</option>
+            <option value="new-arrivals" title="Shows newly added items">New Arrivals</option>
+            <option value="a-z" title="Sorts alphabetically from A to Z">A - Z</option>
+            <option value="z-a" title="Sorts alphabetically from Z to A">Z - A</option>
+        </select>
+    
+        <!-- Apply Filters Button -->
+        <button onclick="applyFilters()">Apply Filters</button>
+    
+        <!-- Clear Filters Button -->
+        <button onclick="clearFilters()" style="background-color: #ccc; color: #333;">Clear Filters</button>
+    </div>
+    
+    <div id="results"></div> <!-- This is where the filtered results will be displayed -->
+    
+         
+    <div class="menu-item">
+        <a href="http://localhost:3000/logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Log out</span>
+        </a>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function applyFilters() {
-        const categoryId = document.getElementById('category-filter').value;
-        const price = document.getElementById('price-filter').value;
-        window.location.href = `/books/filter?categoryId=${categoryId}&price=${price}`;
+        const categoryId = $('#category-filter').val();
+        const price = $('#price-filter').val();
+        const sort = $('#sort-filter').val();
+        console.log(categoryId, price, sort);
+        
+        // Perform AJAX request
+        $.ajax({
+            url: '/userbook/filter', 
+            method: 'GET',
+            data: {
+                categoryId: categoryId,
+                price: price,
+                sort: sort
+            },
+            success: function(data) {
+    console.log(data);
+    if (data.success) {
+        // Build the HTML for books dynamically
+        let booksHtml = '';
+
+        data.books.forEach(function(book) {
+            booksHtml += `
+                <div class="book-card" data-id="${book._id}">
+                    <!-- Wishlist Button -->
+                    <button class="wishlist-btn" data-id="${book._id}" title="Add to wishlist">
+                        <i class="far fa-heart"></i>
+                    </button>
+                    <!-- Book Cover Image -->
+                    <img src="images/uploads/${book.bookDetails.coverImageName}" alt="Book Cover">
+                    <!-- Book Title -->
+                    <div class="book-title">${book.bookDetails.book_name || ''}</div>
+                    <!-- Book Author -->
+                    <div class="book-author">${book.bookDetails.author_name || ''}</div>
+                    <!-- Book Rating -->
+                    <div class="rating">${book.average_rating || ''}★</div>
+                    <!-- Price Section -->
+                    <div class="price">
+                        <span class="current-price">
+                            ₹${book.bookDetails.discount 
+                                ? (book.bookDetails.price - (book.bookDetails.price * book.bookDetails.discount / 100)).toFixed(2) 
+                                : book.bookDetails.price}
+                        </span>
+                        <span class="original-price">
+                            ₹${book.bookDetails.price || ''}
+                        </span>
+                    </div>
+                    <!-- Discount Section (if available) -->
+                    ${book.bookDetails.discount ? `<div class="discount">${book.bookDetails.discount} off</div>` : ''}
+                    <!-- Free Delivery Text -->
+                    <div class="free-delivery">free delivery</div>
+                    <hr class="separator-line">
+                </div>
+            `;
+        });
+
+        // Append the generated books HTML to the #books container
+        $('#books').html(booksHtml);
     }
+}
+,
+            error: function(xhr, status, error) {
+                console.error('AJAX error:', error);
+            }
+        });
+    }
+
+    function clearFilters() {
+        $('#category-filter').prop('selectedIndex', 0); // Reset to "All Categories"
+        $('#price-filter').prop('selectedIndex', 0); // Reset to "All Prices"
+        $('#sort-filter').prop('selectedIndex', 0); // Reset to "Select Sorting"
+        applyFilters(); // Apply the cleared filters
+    }
+
+    // Event delegation for dynamically loaded book-card elements
+    $(document).on('click', '.book-card', function() {
+        const bookId = $(this).data('id');
+        if (bookId) {
+            window.location.href = `/userbook/view-book?bookId=${bookId}`;
+        }
+    });
 </script>
+
 
 </body>
 </html>

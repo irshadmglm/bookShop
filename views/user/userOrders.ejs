@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart Product Design</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin-top: 130px;
+        }
+
+        .main-container {
+            display: flex;
+            align-items: start;
+        }
+
+        .head {
+            margin-left: 320px;
+        }
+
+        .cart-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-item-container {
+            display: flex;
+            padding: 20px;
+            background-color: #fff9ef;
+            border-radius: 12px;
+            width: 600px;
+            margin: 20px 290px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Product Image Styling */
+        .cart-item-image {
+            width: 120px;
+            height: 150px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+
+        /* Details Section */
+        .cart-item-details {
+            flex: 1;
+            color: #333;
+        }
+
+        .cart-item-details p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        /* Price Styling */
+        .price {
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+        }
+
+        /* Stock Information */
+        .stock {
+            color: #4CAF50;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        /* Button Styles */
+        /* .remove-btn {
+            background-color: #5c3804;
+            color: #fff;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        } */
+
+        /* Quantity Controls */
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .quantity-controls button {
+            background-color: #ffda77;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+
+        .quantity-display {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            text-align: center;
+            width: 30px;
+        }
+
+        .cart-container {
+            position: fixed;
+            right: 10px;
+            font-family: Arial, sans-serif;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 370px;
+            margin: auto;
+        }
+
+        .voucher-section {
+            margin-bottom: 20px;
+            background-color: #fef8e2;
+            padding: 15px;
+            border-radius: 5px;
+
+        }
+
+        .voucher-section label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .voucher-section input {
+            width: 95%;
+            padding: 8px;
+            border: none;
+            border-bottom: 1px solid #333;
+            background-color: transparent;
+            font-size: 14px;
+            color: #212121;
+            outline: none;
+        }
+
+
+        .apply-button {
+            background-color: #ffdc51;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 145px;
+            margin-top: 10px;
+        }
+
+        .price-details {
+            margin-bottom: 20px;
+            background-color: #fef8e2;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+
+        }
+
+        .price-details h2 {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        .price-details p {
+            margin: 5px 0;
+        }
+
+        .discount {
+            color: green;
+        }
+
+        .subtotal {
+            color: orange;
+            font-weight: bold;
+        }
+
+        .order-button {
+            background-color: #ffdc51;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .cart-count {
+            background-color: #fdedb5;
+            color: #333;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 50%;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .cart-label {
+            font-size: 16px;
+            font-weight: 400;
+            color: #333;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #ffce47;
+            /* Green background for success */
+            color: rgb(101, 63, 6);
+            padding: 10px 20px;
+            border-radius: 5px;
+            opacity: 1;
+            transition: opacity 0.5s ease, bottom 0.5s ease;
+            z-index: 1000;
+        }
+
+        .toast.hide {
+            opacity: 0;
+            bottom: 10px;
+        }
+
+        .empty-cart-message {
+            background-color: #faedc9;
+            border-radius: 20px;
+            width: 300px;
+            height: 100px;
+            padding: 50px 100px;
+            margin-left: 500px;
+            text-align: center;
+            font-size: 18px;
+            margin-top: 50px;
+            color: #16110e;
+        }
+
+        /* Subtle link button style */
+        .return-link {
+            font-size: 14px;
+            color: #3e3603;
+            /* Gray text */
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            display: inline-block;
+            transition: color 0.3s ease, background-color 0.3s ease;
+            border: none;
+
+        }
+
+        /* On hover, change the color */
+        .return-link:hover {
+            color: #493305;
+            /* Blue color on hover */
+            background-color: #efd47a;
+            /* Light gray background */
+        }
+
+        /* Optional: Disabled state (if applicable) */
+        .return-link.disabled {
+            color: #cccccc;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+
+        .return-link.disabled:hover {
+            background-color: transparent;
+            color: #cccccc;
+        }
+        /* Modal Background */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1; /* Stay on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* Semi-transparent background */
+        }
+
+        /* Modal Content */
+        .modal-content {
+            background-color: rgb(250, 246, 233);
+            padding: 20px;
+            margin: 15% auto;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+       
+
+        /* Styling for Form */
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #f5efbc;
+            color: black;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .button {
+            width: 48%;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cancel-button {
+            background-color: #462208;
+            color: #fff;
+        }
+
+        .save-button {
+            background-color: #fecb53;
+            color: #3f0606;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <%- include('../partials/userHeader') %>
+        <%- include('../partials/usersSidebar') %>
+            <% if (userOrders && userOrders.length> 0) { %>
+                <div class="head">
+                    <span class="cart-icon"><i class="fas fa-shopping-cart"></i></span>
+                    <span class="cart-label">Order</span>
+
+                </div>
+                <% } %>
+                    <div class="main-container">
+                        <div class="cart-item">
+                            <% if (userOrders && userOrders.length> 0) { %>
+                                <% userOrders.forEach((order, i)=> { %>
+                                    <% order.items.forEach((item, i)=> { %>
+
+                                        <div class="cart-item-container">
+                                            <!-- Product Image -->
+                                            <img src="/images/uploads/<%= item.coverImageName || '' %>"
+                                                alt="Product Image" class="cart-item-image">
+
+                                            <!-- Product Details -->
+                                            <div class="cart-item-details">
+                                                <p><strong>Title:</strong>
+                                                    <%= item.bookName || ' ' %>
+                                                </p>
+                                                <p><strong>Author:</strong>
+                                                    <%= item.authorName || ' ' %>
+                                                </p>
+                                                <p><strong>Category:</strong>
+                                                    <%= item.category || ' ' %>
+                                                </p>
+                                                <p class="price">quantity: <%= item.quantity || ' ' %>
+                                                </p>
+                                                <p class="price">₹<%= item.subtotal || ' ' %>/-</p>
+                                                <p class="price">Ordered on <%= order.createdAt || ' ' %>
+                                                </p>
+
+                                            </div>
+                                            <div class="status">
+                                                <% if( item.orderStatus=='Pending' ){%>
+                                                    <p style="color: rgb(6, 145, 34); font-weight: bold;" class="stock">
+                                                        Order Confirmed
+                                                    </p>
+                                                    <% }else if( item.orderStatus=='Delivered' ){ %>
+                                                        <p style="color: rgb(0, 153, 10);" class="stock">
+                                                            <%= item.orderStatus || ' ' %> on <%=
+                                                                    item.statusChangedAt.toDateString() || ' ' %>
+                                                        </p>
+                                                        <% }else if( item.orderStatus=='Cancelled' ){ %>
+                                                            <p style="color: rgb(255, 60, 0);" class="stock">
+                                                                <%= item.orderStatus || ' ' %> on <%=
+                                                                        item.statusChangedAt.toDateString() || ' ' %>
+                                                            </p>
+                                                        <% }else if( item.orderStatus=='returned' ){ %>
+                                                            <p style="color: rgb(255, 60, 0);" class="stock">
+                                                                <%= item.orderStatus || ' ' %> on <%=
+                                                                        item.statusChangedAt.toDateString() || ' ' %>
+                                                            </p>
+                                                            <% }else if( item.orderStatus=='Shipped' ){ %>
+                                                                <p style="color: rgb(28, 180, 139);" class="stock">
+                                                                    <%= item.orderStatus || ' ' %> on <%=
+                                                                            item.statusChangedAt.toDateString() || ' '
+                                                                            %>
+                                                                </p>
+                                                                <% } %>
+                                                        <!-- Remove Button and Quantity Controls -->
+                                                   <% if( item.orderStatus=='Pending' ||
+                                                       item.orderStatus=='Shipped' ){ %>
+                                                       <div class="controls">
+                                                       <button
+                                                    value="<%= item.bookId %>,<%= order._id%>"
+                                                           class="return-link remove-btn">cancel</button>
+                                                      </div>
+                                                       <% } %>
+                                                    <% if (item.orderStatus=='Delivered' ) { %>
+                                                    <a href="javascript:void(0);"
+                                                  class="return-link" id="<%= item.bookId %>,<%= order._id%>"
+                                            onclick="openReturnModal()">Return Item</a>
+                                                  <% } %>
+                                            </div>
+                                        </div>
+
+                                        <!-- Modal Pop-up for Return Reason -->
+                        <div id="returnModal" class="modal">
+                            <div class="modal-content">
+                                <h2>Why are you returning this book?</h2>
+                              
+                                    <label for="returnReason">Choose a reason:</label>
+                                    <select id="returnReason" >
+                                        <option value="Damaged">Damaged</option>
+                                        <option value="Wrong Item">Wrong Item</option>
+                                        <option value="Better Price Available">Better Price Available</option>
+                                        <option value="No Longer Needed">No Longer Needed</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                  <div class="button-group">
+                                    <button type="button" id="return-order" class="button save-button return-order" value="<%= item.bookId %>,<%= order._id%>">Submit Return</button>
+                                    <button type="button" onclick="closeReturnModal()" class="button cancel-button">No, Keep Order</button>
+
+                                
+                                  </div>
+                                
+                            </div>
+                        </div>
+
+
+                                        <% }) %>
+                                            <% }) %>
+                        </div>
+                        
+
+                    </div>
+                    <%- include('../partials/footer') %>
+
+                        <% } else { %>
+                            <!-- Empty cart message -->
+                            <div class="empty-cart-message">
+                                <h2><i class="fas fa-shopping-cart"></i></h2>
+                                <h4> No order yet.</h4>
+                            </div>
+
+                            <% } %>
+
+                                <script>
+                                    document.querySelectorAll('.remove-btn').forEach((button) => {
+                                        button.addEventListener('click', async (event) => {
+                                            const statusElement = event.target.closest('.status').querySelector('.stock');
+                                            if (confirm("Are you sure you want to cancel this order?")) {
+                                                const ids = button.value;
+                                                console.log(ids);
+                                                const [bookId, orderId] = ids.split(',')
+                                                const cartItem = button.closest('.cart-item-container');
+
+                                                try {
+                                                    const response = await fetch('/order/cancel-from-order', {
+                                                        method: 'POST',
+                                                        headers: { 'Content-Type': 'application/json' },
+                                                        body: JSON.stringify({ bookId, orderId })
+                                                    });
+
+                                                    const data = await response.json();
+
+                                                    if (data.success) {
+                                                        showToast('Order canceled!');
+                                                        // cartItem.remove(); 
+                                                        // Update the status text and color in the UI
+                                                        statusElement.textContent = 'Canceled';
+                                                        statusElement.style.color = 'rgb(255, 60, 0)';
+
+                                                        // Optionally disable the button after status update
+                                                        button.disabled = true;
+                                                        button.style.cursor = 'not-allowed';
+                                                        button.textContent = 'Canceled';
+                                                    } else {
+                                                        showToast('Failed to cancel order: ' + data.message);
+                                                    }
+                                                } catch (error) {
+                                                    console.error('Error:', error);
+                                                    showToast('Failed to delete order item.');
+                                                }
+                                            }
+                                        });
+                                    });
+                                   let button = document.querySelectorAll('.return-order').forEach((button)=>{
+                                    button.addEventListener('click', async (event) => {
+                                            // const statusElement = event.target.closest('.status').querySelector('.stock');
+                                                const ids = button.value;
+                                                console.log(ids);
+                                                const [bookId, orderId] = ids.split(',')
+                                                const selectedReason = document.getElementById("returnReason").value;
+                                                try {
+                                                    const response = await fetch('/order/return-order', {
+                                                        method: 'POST',
+                                                        headers: { 'Content-Type': 'application/json' },
+                                                        body: JSON.stringify({ bookId, orderId })
+                                                    });
+
+                                                    const data = await response.json();
+
+                                                    if (data.success) {
+                                                        showToast('Order returned!');
+                                                        closeReturnModal();
+                                                        // statusElement.textContent = 'returned';
+                                                        // statusElement.style.color = 'rgb(255, 60, 0)';
+
+                                                        // Optionally disable the button after status update
+                                                        button.disabled = true;
+                                                        button.style.cursor = 'not-allowed';
+                                                        button.textContent = 'returned';
+                                                    } else {
+                                                        showToast('Failed to return order: ' + data.message);
+                                                    }
+                                                } catch (error) {
+                                                    console.error('Error:', error);
+                                                    showToast('Failed to return order item.');
+                                                }
+                                            
+                                        });
+                                   })
+                                        
+                                   
+
+
+                                    document.querySelectorAll('.quantity').forEach((button) => {
+                                        button.addEventListener('click', () => {
+                                            const arr = button.value.split(',')
+                                            const quantityDisplay = event.target.closest('.controls').querySelector('.quantity-display');
+                                            const cartItem = button.closest('.cart-item-container');
+                                            const quantityString = quantityDisplay.textContent;
+                                            const quantity = Number(quantityString);
+                                            const bookId = arr[0];
+                                            const count = Number(arr[1]);
+                                            fetch('/user-cart/change-quantity', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ bookId, count })
+                                            })
+                                                .then(response => {
+                                                    if (!response.ok) {
+                                                        return response.json().then(error => { throw new Error(error.message); });
+                                                    }
+                                                    return response.json();
+                                                })
+                                                .then(data => {
+                                                    if (data.success) {
+                                                        quantityDisplay.textContent = quantity + count;
+                                                        if (data.message == "Item removed from cart successfully") {
+                                                            cartItem.style.transition = "opacity 0.5s ease";
+                                                            cartItem.style.opacity = 0;
+                                                            setTimeout(() => {
+                                                                cartItem.remove();
+
+                                                            }, 500);
+                                                        }
+                                                        showToast(data.message);
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    console.error('Error:', error);
+                                                    showToast(error.message || 'An error occurred');
+                                                });
+
+                                        })
+                                    })
+
+                                    function showToast(message) {
+                                        const toast = document.createElement('div');
+                                        toast.className = 'toast';
+                                        toast.textContent = message;
+                                        document.body.appendChild(toast);
+                                        setTimeout(() => {
+                                            toast.classList.add('hide');
+                                            setTimeout(() => toast.remove(), 500);
+                                        }, 2000);
+                                    }
+
+                             function updateCartCount(quantity) {
+                                const cartCountElement = document.querySelector('.cart-count');
+                                const currentCount = Number(cartCountElement.textContent) || 0;
+                                const updatedCount = currentCount - quantity;
+                               cartCountElement.textContent = updatedCount >= 0 ? updatedCount : 0;
+                               }
+
+                            document.getElementById('order-button').addEventListener('click', () => {
+                             window.location.href = `/order/check-out`;
+                            })
+
+                        // Function to open the modal
+                        function openReturnModal() {
+                        document.getElementById("returnModal").style.display = "block";
+                                }
+                      // Function to close the modal
+                      function closeReturnModal() {
+                         document.getElementById("returnModal").style.display = "none";
+                          }
+
+                        // Close the modal if the user clicks anywhere outside the modal content
+                           window.onclick = function(event) {
+                          var modal = document.getElementById("returnModal");
+                          if (event.target == modal) {
+                           modal.style.display = "none";
+                         }
+                       }
+
+                   </script>
+</body>
+
+</html>

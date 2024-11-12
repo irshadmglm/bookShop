@@ -129,7 +129,7 @@
 
         .nav {
             position: fixed;
-            top: 60px; /* Directly below the header */
+            top: 60px;
             left: 0;
             width: 100%;
             display: flex;
@@ -163,7 +163,6 @@
             border: none;
         }
 
-        /* Sample content area */
         .content {
             padding: 20px;
         }
@@ -180,15 +179,21 @@
     </div>
     <div class="icon">
         <% if (session.user) { %>
+            <a href="/user-cart"><i class="fas fa-shopping-cart"></i></a>
             <div class="dropdown">
                 <button class="user-btn">
                     <i class="fas fa-user"></i> <%= session.user.name %>
                 </button>
                 <div class="dropdown-content">
-                    <a href="/profile">Profile</a>
-                    <a href="/orders">Orders</a>
-                    <a href="/logout">Log Out</a> 
+                    <a href="/profile"><i class="fas fa-user"></i> Profile</a>
+                    <a href="/user-cart"><i class="fas fa-shopping-cart"></i> Cart</a>
+                    <a href="/order"><i class="fas fa-history"></i> Orders</a>
+                    <a href="/coupons"><i class="fas fa-ticket-alt"></i> Coupons</a>
+                    <a href="/wallet"><i class="fas fa-wallet"></i> Wallet</a>
+                    <a href="/wish-list"><i class="fas fa-heart"></i> Wish List</a>
+                    <a href="/logout"><i class="fas fa-sign-out-alt"></i> Log Out</a> 
                 </div>
+                
             </div>
         <% } else { %>
             <div class="dropdown">
@@ -204,7 +209,6 @@
     
 </div>
 
-<!-- Navigation Section -->
 <div class="nav">
     <a href="/" class="active">Home</a>
     <a href="#">New Releases</a>
@@ -213,7 +217,6 @@
     <a href="#">Contact Us</a>
 </div>
 
-<!-- Include Font Awesome for icons -->
 <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 
 </body>

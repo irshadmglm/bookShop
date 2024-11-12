@@ -3,131 +3,209 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Book Store</title>
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          margin-left: 180px;
+      }
+      .book-container {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 20px;
+          margin-left: 150px;
+          margin-top: 10px;
+      }
+      .book-card {
+          background-color: white;
+          width: 18%;
+          border-radius: 8px;
+          padding: 3px;
+          transition: transform 0.2s ease-in-out;
+          position: relative;
+      }
+      .book-card:hover {
+          transform: translateY(-10px);
+      }
+      .book-card img {
+          width: 140px;
+          height: auto;
+          border-radius: 4px;
+          box-shadow: 0 3px 5px rgba(0, 0, 0, 0.6);
+      }
+      .book-title {
+          font-size: 14px;
+          font-weight: bold;
+          margin: 5px 0;
+      }
+      .book-author {
+          color: gray;
+          font-size: 12px;
+          margin-bottom: 4px;
+      }
+      .price {
+          margin: 5px 0;
+      }
+      .price .current-price {
+          font-size: 16px;
+          font-weight: bold;
+          color: #4CAF50;
+      }
+      .price .original-price {
+          text-decoration: line-through;
+          margin-left: 10px;
+          color: gray;
+      }
+      .discount {
+          color: #FF5722;
+          font-size: 12px;
+      }
+      .rating {
+          display: inline-block;
+          background-color: #4CAF50;
+          color: white;
+          padding: 2px 5px;
+          border-radius: 5px;
+          font-size: 12px;
+      }
+      .free-delivery {
+          margin-top: 10px;
+          color: #4CAF50;
+          font-size: 12px;
+      }
+      .separator-line {
+        border: none;
+        border-top: 1px solid #ddd;
+        margin: 10px 0 0;
+      }
+      /* Wishlist Heart Button Styles */
+      .wishlist-btn {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          border: none;
+          cursor: pointer;
+          font-size: 15px;
+          color: gray;
+          background-color: rgb(255, 255, 255);
+          padding: 4px 5px;
+          border-radius: 10px;
+          box-shadow: 0 3px 5px rgba(0, 0, 0, 0.6);
+      }
+      .wishlist-btn.active {
+          color: red;
+      }
+  </style>
 </head>
 <body>
-  <%- include('../partials/userHeader') %>
-  <%- include('../partials/userSidebar') %>
-  
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Book Store</title>
-      <style>
-          body {
-              font-family: Arial, sans-serif;
-              margin-left: 180px;
-          }
-          .book-container {
-              display: flex;
-              flex-wrap: wrap;
-              gap: 20px;
-              margin-left: 150px;
-              margin-top: 10px;
-          }
-          .book-card {
-              background-color: white;
-              width: 18%;
-              border-radius: 8px;
-              padding: 3px;
-             
-              transition: transform 0.2s ease-in-out;
-          }
-          .book-card:hover {
-              transform: translateY(-10px);
-          }
-          .book-card img {
-              width: 140px;
-              height: auto;
-              border-radius: 4px;
-              box-shadow: 0 3px 5px rgba(0, 0, 0, 0.6);
-          }
-          .book-title {
-              font-size: 14px;
-              font-weight: bold;
-              margin: 5px 0;
-          }
-          .book-author {
-              color: gray;
-              font-size: 12px;
-              margin-bottom: 4px;
-          }
-          .price {
-              margin: 5px 0;
-          }
-          .price .current-price {
-              font-size: 16px;
-              font-weight: bold;
-              color: #4CAF50;
-          }
-          .price .original-price {
-              text-decoration: line-through;
-              margin-left: 10px;
-              color: gray;
-          }
-          .discount {
-              color: #FF5722;
-              font-size: 12px;
-          }
-          .rating {
-              display: inline-block;
-              background-color: #4CAF50;
-              color: white;
-              padding: 2px 5px;
-              border-radius: 5px;
-              font-size: 12px;
-          }
-          .free-delivery {
-              margin-top: 10px;
-              color: #4CAF50;
-              font-size: 12px;
-          }
-          .separator-line {
-            border: none;
-            border-top: 1px solid #ddd;
-            margin: 10px 0 0;
-        }
 
-      </style>
-  </head>
-  <body>
-  
- 
-         
-      <%- include('../partials/breadcrumb', { breadcrumbs: breadcrumbs }) %>  
+<%- include('../partials/userHeader') %>
+<%- include('../partials/userSidebar') %>
+<%- include('../partials/breadcrumb', { breadcrumbs: breadcrumbs }) %>  
 
-    <div class="book-container">
-         <% books.forEach(function(book) { %>
-            <div class="book-card" data-id="<%= book._id %>">
-                <img src="images/uploads/<%= book.bookDetails.coverImageName %>" alt="Book Cover">
-                <div class="book-title"><%= book.bookDetails.book_name || ''  %></div>
-                <div class="book-author"><%= book.bookDetails.author_name || ''   %></div>
-                <div class="rating"><%= book.average_rating || ''  %>★</div>
-                <div class="price">
-                    <span class="current-price">₹<%= book.bookDetails.price || ''  %></span>
-                    <span class="original-price">₹<%= book.bookDetails.price || ''  %></span>
-                </div>
-                <div class="discount"><%= book.bookDetails.discount || ''  %> off</div>
-                <div class="free-delivery">free delivery</div>
-                <hr class="separator-line">
+<div class="book-container" id="books">
+    <% books.forEach(function(book) { %>
+        <div class="book-card" data-id="<%= book._id %>">
+            <button class="wishlist-btn" data-id="<%= book._id %>" title="Add to wishlist">
+                <i class="far fa-heart"></i>
+            </button>
+            <img src="/images/uploads/<%= book.bookDetails.coverImageName %>" alt="Book Cover">
+            <div class="book-title"><%= book.bookDetails.book_name || '' %></div>
+            <div class="book-author"><%= book.bookDetails.author_name || '' %></div>
+            <div class="rating"><%= book.average_rating || '' %>★</div>
+            <div class="price">
+                <span class="current-price">
+                    ₹<%= book.bookDetails.discount ? (book.bookDetails.price - (book.bookDetails.price * book.bookDetails.discount / 100)).toFixed(2) : book.bookDetails.price %>
+                </span>
+                <span class="original-price">
+                    ₹<%= book.bookDetails.price || '' %>
+                </span>
+                  
             </div>
-        <% }); %>
-   </div>
-  <%- include('../partials/footer') %>
-  <script>
-       document.querySelectorAll('.book-card').forEach(bookcard => {
-            bookcard.addEventListener('click', function() {
-              const bookId = this.getAttribute('data-id');
-                if (bookId) {
-                    window.location.href = `/userbook/view-book?bookId=${bookId}`;
+            <% if(book.bookDetails.discount){ %>
+                <div class="discount"><%= book.bookDetails.discount || '' %> off</div>
+                <% } else { %>
+                    <br>
+                    <% } %>
+            
+            <div class="free-delivery">free delivery</div>
+            <hr class="separator-line">
+        </div>
+    <% }); %>
+</div>
+
+<%- include('../partials/footer') %>
+
+<script>
+    document.querySelectorAll('.book-card').forEach(bookCard => {
+        bookCard.addEventListener('click', function(event) {
+            const bookId = this.getAttribute('data-id');
+            if (bookId && !event.target.closest('.wishlist-btn')) {
+                window.location.href = `/userbook/view-book?bookId=${bookId}`;
+            }
+        });
+    });
+
+    document.querySelectorAll('.wishlist-btn').forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.stopPropagation();
+            const bookId = this.getAttribute('data-id');
+            const isAdding = !this.classList.contains('active');
+            const status = isAdding ? 'add' : 'remove';
+
+            fetch(`/wish-list/add-to-wishlist`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ bookId, status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.classList.toggle('active', isAdding);
+                    this.querySelector('i').classList.toggle('fas', isAdding);
+                    this.querySelector('i').classList.toggle('far', !isAdding);
+                } else {
+                    alert('Could not update wishlist. Please try again.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+        fetch(`/wish-list/getwishlist-status`, {
+                method: 'get',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+
+                    data.books.forEach((book) => {
+                const wishlistBtn = document.querySelector(`.wishlist-btn[data-id='${book.bookId}']`);
+                if (wishlistBtn) {
+                    wishlistBtn.classList.add('active');
+                    wishlistBtn.querySelector('i').classList.remove('far');
+                    wishlistBtn.querySelector('i').classList.add('fas');
                 }
             });
-        });
-  </script>
-  </body>
-  </html>
-  
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    
+       });
+
+    
+</script>
+
 </body>
 </html>

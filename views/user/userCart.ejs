@@ -236,24 +236,49 @@
             opacity: 0;
             bottom: 10px;
         }
+        .empty-cart-message {
+            background-color: #faedc9;
+            border-radius: 20px;
+            width: 300px;
+            height: 100px;
+            padding: 50px 100px;
+            margin-left: 500px;
+    text-align: center;
+    font-size: 18px;
+    margin-top: 50px;
+    color: #16110e; 
+        }
+        .in-stock {
+            color: green;
+            font-weight: bold;
+        }
+
+        .out-of-stock {
+            color: red;
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
+    
     <%- include('../partials/userHeader') %>
         <%- include('../partials/usersSidebar') %>
-
+        <% if( items){ %>
             <div class="head">
                 <span class="cart-icon"><i class="fas fa-shopping-cart"></i></span>
                 <span class="cart-label">cart</span>
                 <span class="cart-count">
+                    
                     <%= items.items.reduce((acc, item)=> item.quantity + acc, 0) || '' %>
                 </span>
             </div>
-
+            <% } %>
             <div class="main-container">
                 <div class="cart-item">
+                    <% if( items){ %>
                     <% items.items.forEach((item, i)=> { %>
+                        
                         <div class="cart-item-container">
                             <!-- Product Image -->
                             <img src="/images/uploads/<%= item.coverImageName || '' %>" alt="Product Image"
@@ -262,26 +287,29 @@
                             <!-- Product Details -->
                             <div class="cart-item-details">
                                 <p><strong>Title:</strong>
-                                    <%= item.bookName %>
+                                    <%= item.bookName || ' ' %>
                                 </p>
                                 <p><strong>Author:</strong>
-                                    <%= item.authorName %>
+                                    <%= item.authorName || ' ' %>
                                 </p>
                                 <p><strong>Category:</strong>
-                                    <%= item.category %>
+                                    <%= item.category || ' ' %>
                                 </p>
-                                <p class="price">₹<%= item.price %>/-</p>
-                                <p class="stock">In stock</p>
+                                <p class="price">₹<%= item.subtotal || ' ' %>/-</p>
+                                <p class="<%= item.stockCount > 0 ? 'in-stock' : 'out-of-stock' %>">
+                                    <%= item.stockCount> 0 ? 'In Stock' : 'Out of Stock' %>
+                                </p>
+                                
 
                                 <!-- Remove Button and Quantity Controls -->
                                 <div class="controls">
                                     <button value="<%= item.bookId %>" class="remove-btn">Remove</button>
                                     <div class="quantity-controls">
-                                        <button>-</button>
-                                        <div  class="quantity-display">
-                                            <%= item.quantity %>
+                                        <button class="quantity" value="<%= item.bookId %>,-1,<%= item.quantity %>">-</button>
+                                        <div class="quantity-display">
+                                            <%= item.quantity || ' ' %>
                                         </div>
-                                        <button>+</button>
+                                        <button class="quantity" value="<%= item.bookId %>,1,<%= item.quantity %>">+</button>
                                     </div>
                                 </div>
                             </div>
@@ -301,17 +329,17 @@
                         <h2>Price details</h2>
                         <br>
                         <p><strong>Number of books:</strong> <span>
-                                <%= items.items.length%>
+                                <%= items.items.length || ' '%>
                             </span></p>
                         <p><strong>Price:</strong> <span>
-                                <%= items.totalPrice %>/-
+                                <%= items.totalPrice || ' ' %>/-
                             </span></p>
                         <p><strong>Delivery Charges:</strong> <span>0</span></p>
                         <p><strong>Discount:</strong> <span class="discount">0</span></p>
                         <p><strong>Sub Total:</strong> <span class="subtotal">
-                                <%= items.totalPrice %>/-
+                                <%= items.totalPrice || ' ' %>/-
                             </span></p>
-                        <button class="order-button">Place to order</button>
+                        <button id="order-button" class="order-button">Place to order</button>
 
                     </div>
 
@@ -319,9 +347,19 @@
 
             </div>
             <%- include('../partials/footer') %>
+
+            <% } else { %>
+                <!-- Empty cart message -->
+                <div class="empty-cart-message">
+                    <h2><i class="fas fa-shopping-cart"></i></h2>
+                    <h4> Your cart is currently empty.</h4>
+                </div>
+                
+            <% } %>
+            
                 <script>
                     document.querySelectorAll('.remove-btn').forEach((button) => {
-                        button.addEventListener('click', () => {
+                        button.addEventListener('click', (event) => {
                             const bookId = button.value;
                             const quantityDisplay = event.target.closest('.controls').querySelector('.quantity-display');
                             const quantityString = quantityDisplay.textContent;
@@ -341,7 +379,7 @@
                                         updateCartCount(quantity);
                                         setTimeout(() => {
                                             cartItem.remove();
-                                        
+
                                         }, 500);
                                     }
                                 })
@@ -349,6 +387,48 @@
                                     console.error('Error:', error);
                                     showToast('Failed to delete cart item.');
                                 });
+                        })
+                    })
+
+                    document.querySelectorAll('.quantity').forEach((button) => {
+                        button.addEventListener('click', () => {
+                            const arr = button.value.split(',')
+                            const quantityDisplay = event.target.closest('.controls').querySelector('.quantity-display');
+                            const cartItem = button.closest('.cart-item-container');
+                            const quantityString = quantityDisplay.textContent;
+                            const quantity = Number(quantityString);
+                            const bookId = arr[0];
+                            const count = Number(arr[1]);
+                            fetch('/user-cart/change-quantity', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ bookId, count })
+                            })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        return response.json().then(error => { throw new Error(error.message); });
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    if (data.success) {
+                                        quantityDisplay.textContent = quantity + count;
+                                        if(data.message == "Item removed from cart successfully" ){
+                                            cartItem.style.transition = "opacity 0.5s ease";
+                                            cartItem.style.opacity = 0;
+                                            setTimeout(() => {
+                                            cartItem.remove();
+
+                                        }, 500);
+                                        }
+                                        showToast(data.message);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    showToast(error.message || 'An error occurred');
+                                });
+
                         })
                     })
 
@@ -364,17 +444,45 @@
                     }
 
                     function updateCartCount(quantity) {
-    const cartCountElement = document.querySelector('.cart-count');
-    
-    // Get the current count as a number
-    const currentCount = Number(cartCountElement.textContent) || 0; // Fallback to 0 if empty
-    
-    // Calculate the new count
-    const updatedCount = currentCount - quantity;
+                        const cartCountElement = document.querySelector('.cart-count');
+                        const currentCount = Number(cartCountElement.textContent) || 0;
+                        const updatedCount = currentCount - quantity;
+                        cartCountElement.textContent = updatedCount >= 0 ? updatedCount : 0; 
+                    }
 
-    // Update the cart count element
-    cartCountElement.textContent = updatedCount >= 0 ? updatedCount : 0; // Ensure the count doesn't go negative
-}
+                    document.getElementById('order-button').addEventListener('click',()=>{
+                    window.location.href = `/order/check-out`;
+                    })
+
+
+                    // Apply Coupon
+                    document.querySelector('.apply-button').addEventListener('click', () => {
+                        const couponCode = document.getElementById('coupon-code').value.trim();
+
+                        if (couponCode) {
+                            fetch('/coupons/apply-coupon', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ couponCode })
+                            })
+                            .then(response => response.json())
+                            .then(data => { 
+                                if (data.success) {
+                                    document.querySelector('.discount').textContent = data.discountAmount;
+                                    document.querySelector('.subtotal').textContent = data.newTotalPrice + '/-';
+                                    showToast('coupon applied');
+                                } else {
+                                    showToast(data.message || 'Coupon application failed.');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                showToast('An error occurred while applying the coupon.');
+                            });
+                        } else {
+                            showToast('Please enter a coupon code.');
+                        }
+                    });
 
                 </script>
 </body>

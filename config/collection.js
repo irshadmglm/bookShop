@@ -6,5 +6,11 @@ module.exports = {
     RATING_COLLECTION : 'rating',
     ADDRESS_COLLECTION : 'address',
     PASSWORD_RESETS_COLLECTION : 'passwordResets',
-    USER_CART_COLLECTION : 'userCart'
+    USER_CART_COLLECTION : 'userCart',
+    ORDER_COLLECTION : 'orders',
+    COUPON_COLLECTION :'coupon',
+    WISHLIST_COLLECTION : 'wishlist',
+    OFFER_COLLECTION : 'offers',
+    PAYMENT_COLLECTION : 'payment',
+    WALLET_COLLECTION : 'wallet'
 }

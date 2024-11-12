@@ -162,7 +162,7 @@
             <select id="category" name="categoryId" required>
                 <option value="">Select</option>
                 <% categories.forEach(category => { %>
-                    <option value="<%= category._id %>"><%= category.categoryData.categoryName %></option>
+                    <option value="<%= category._id %>" <%= category.categoryData.categoryName === book.bookDetails.category ? 'selected' : ''  %> ><%= category.categoryData.categoryName  %></option>
                     <% }) %>
             </select>
         </div>
@@ -188,7 +188,7 @@
         </div>
         <div class="form-group">
             <label for="price">Price</label>
-            <input type="text" id="price" name="price" value="<%= book.bookDetails.price || '' %>" required>
+            <input type="number" id="price" name="price" min="0" value="<%= book.bookDetails.price || '' %>" required>
         </div>
         <div class="form-group">
             <label for="language">Language</label>
@@ -206,11 +206,13 @@
             <label for="published-date">Published Date</label>
             <input type="date" id="published-date" name="published_date" value="<%= book.bookDetails.published_date || '' %>"  required>
         </div>
+        
         <div class="form-group">
             <label for="stock">Stock</label>
             <div class="stock-controls">
-                <input type="number" id="stock" name="stock" value="2" min="0" required>
+                <input type="number" id="stock" name="stock" value="<%= book.bookDetails.stock || '' %>" min="0" required>
             </div>
+            
         </div>
        
         <div class="form-group">

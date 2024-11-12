@@ -4,10 +4,13 @@ const db = require('../../config/connection');
 const bcrypt = require('bcrypt');
 
 module.exports = {
-    addBook: (bookDetails) => {
+    addBook: function (bookDetails) {
         return new Promise(async (resolve, reject) => {
+            
             try {
-                let response = await db.get().collection(collections.BOOK_COLLECTION).insertOne({ bookDetails });
+              let data = await this.getCategory(bookDetails.categoryId);
+              bookDetails.category = data.categoryData.categoryName;
+                let response = await db.get().collection(collections.BOOK_COLLECTION).insertOne({ bookDetails, createdAt: new Date() });
                 resolve(response)
             } catch (error) {
                 reject(error)
@@ -61,9 +64,10 @@ module.exports = {
             }
         })
     },
-    updateBook: (bookDetails) => {
+    updateBook: function(bookDetails) {
         return new Promise(async (resolve, reject) => {
-
+            let data = await this.getCategory(bookDetails.categoryId);
+              bookDetails.category = data.categoryData.categoryName;
             const updateFields = {};
 
             for (const key in bookDetails) {
@@ -113,14 +117,19 @@ module.exports = {
         } catch (error) {
             reject(error);
         }
-    },
+    }, 
     addCategory: (categoryData) => {
         return new Promise(async (resolve, reject) => {
-            await db.get().collection(collections.CATEGORIES_COLLECTION).insertOne({ categoryData });
-            resolve();
+           let category = await db.get().collection(collections.CATEGORIES_COLLECTION).findOne({"categoryData.categoryName":categoryData.categoryName})
+            if(!category){
+                await db.get().collection(collections.CATEGORIES_COLLECTION).insertOne({ categoryData });
+                resolve();
+            }else{
+                reject("category already exist");
+            }
         })
     },
-    getCategory: (categoryId) => {
+    getCategory: function (categoryId){
         try {
             return new Promise(async (resolve, reject) => {
                 let category = await db.get().collection(collections.CATEGORIES_COLLECTION).findOne({ _id: new ObjectId(categoryId) });
@@ -172,40 +181,7 @@ module.exports = {
             resolve();
         })
     },
-    filterBooks: function (categoryId, priceRange) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                let priceFilter = {};
-                if (priceRange) {
-                    const [minPrice, maxPrice] = priceRange.split('-');
-                    if (maxPrice) {
-                        // Price range with upper limit
-                        priceFilter = { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) };
-                    } else {
-                        // Price range without upper limit (e.g., 201+)
-                        priceFilter = { $gte: parseInt(minPrice) };
-                    }
-                }
 
-                let query = [
-                    { $match: { is_deleted: { $ne: true } } }, // Exclude deleted books
-                    { $match: { "bookDetails.price": priceFilter } }, // Filter by price
-                ];
-
-                // If a categoryId is provided, add it to the query
-                if (categoryId && categoryId !== '0') {
-                    query.push({ $match: { "bookDetails.categoryId": categoryId } });
-                }
-
-                // Aggregate the filtered results
-                let books = await db.get().collection(collections.BOOK_COLLECTION).aggregate(query).toArray();
-                let categories = await this.getCategories();
-                resolve([books, categories]);
-            } catch (error) {
-                reject(error);
-            }
-        });
-    },
 
     rating: (stars, bookId, userId, review) => {
         return new Promise(async (resolve, reject) => {
@@ -327,5 +303,96 @@ module.exports = {
 
             resolve(books);
         })
-    }
+    },
+
+    filterBooks: function (categoryId, priceRange, sort) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let pipeline = [];
+
+                if (categoryId) {
+                    pipeline.push({
+                        $match: {
+                            "bookDetails.categoryId": categoryId
+                        }
+                    });
+                }
+
+                if (priceRange) {
+                    const [minPrice, maxPrice] = priceRange.split('-').map(Number);
+                    pipeline.push({
+                        $match: {
+                            $expr: {
+                                $and: [
+                                    { $gte: [{ $toInt: "$bookDetails.price" }, minPrice] },
+                                    { $lte: [{ $toInt: "$bookDetails.price" }, maxPrice === 201 ? Infinity : maxPrice] }
+                                ]
+                            }
+                        }
+                    });
+                }
+
+                // Add sorting based on the sort parameter
+                if (sort) {
+                    switch (sort) {
+                        case 'popularity':
+                            pipeline.push({ $sort: { popularity: -1 } });
+                            break;
+                        case 'price-low-high':
+                            pipeline.push({ $sort: { 'bookDetails.price': 1 } });
+                            break;
+                        case 'price-high-low':
+                            pipeline.push({ $sort: { 'bookDetails.price': -1 } });
+                            break;
+                        case 'average-ratings':
+                            pipeline.push({ $sort: { average_rating: -1 } });
+                            break;
+                        case 'in-stock':
+                            pipeline.push({ $match: { 'bookDetails.stock': { $gt: 0 } } });
+                            break;
+                         case 'new-arrivals':
+                            pipeline.push({ $sort: { createdAt: -1 } }); 
+                            break;
+                        case 'a-z':
+                            
+                            pipeline.push({
+                                $project: {
+                                    bookDetails: 1, 
+                                    lowerCaseName: { $toLower: "$bookDetails.book_name" } 
+                                }
+                            });
+                            pipeline.push({
+                                $sort: {
+                                    lowerCaseName: 1 
+                                }
+                            });
+                            break;
+                        case 'z-a':
+                            
+                            pipeline.push({
+                                $project: {
+                                    bookDetails: 1,
+                                    lowerCaseName: { $toLower: "$bookDetails.book_name" }
+                                }
+                            });
+                            pipeline.push({
+                                $sort: {
+                                    lowerCaseName: -1 
+                                }
+                            });
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                let books = await db.get().collection(collections.BOOK_COLLECTION).aggregate(pipeline).toArray();
+                let categories = await this.getCategories();
+                resolve({ books, categories });
+            } catch (error) {
+                reject(error);
+            }
+        });
+    },
+
 }

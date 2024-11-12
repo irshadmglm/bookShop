@@ -1,23 +1,9 @@
 const express = require('express');
-const userManagementHelper = require('../../helpers/admin/userManagementHelper');
+const userMngController = require('../../controllers/admin/userMngController');
 const router = express.Router();
 
-router.get('/',(req,res)=>{
-    userManagementHelper.getusers().then((users)=>{
-        console.log(users);
-        
-        res.render('admin/userManagement',{users:users});
-    }).catch((err)=>{
-        console.log(err);
-    })
-})
+router.get('/',userMngController.getUsers);
 
-router.get('/user-status',(req,res)=>{
-    userManagementHelper.changeStatus(req.query.userId).then((response)=>{
-        console.log(response);
-        
-        res.redirect('/user-management')
-    })
-})
+router.get('/user-status',userMngController.changeStatus)
 
 module.exports = router;

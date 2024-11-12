@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - View All Offers</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Basic reset */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* Body styling */
+        body { font-family: Arial, sans-serif; color: #333; }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 8px;
+            margin-left: 300px;
+        }
+
+        /* Header Section */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header h1 { font-size: 24px; color: #333; }
+
+        /* Category Sort Dropdown */
+        .sort {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sort-label { font-size: 16px; color: #333; font-weight: bold; }
+        .sort-select {
+            padding: 10px 15px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            color: #333;
+            cursor: pointer;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="%23333"%3E%3Cpath d="M2 2l3 3 3-3z"/%3E%3C/svg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 12px;
+            width: 100%;
+            max-width: 250px;
+        }
+
+        /* Search bar styling */
+        .search {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 300px;
+        }
+        .search input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; margin-right: 10px; }
+        .search-btn { background-color: #007bff; border: none; padding: 8px 16px; color: #fff; border-radius: 4px; cursor: pointer; }
+
+        /* Add Offer Button */
+        .add-offer-btn {
+            padding: 10px 16px;
+            background-color: #ffc400;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Offers Table */
+        .offers-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            text-align: left;
+            background-color: #fff;
+        }
+        .offers-table thead { background-color: #faedc9; }
+        .offers-table th, .offers-table td { padding: 12px 15px; border-bottom: 1px solid #dee2e6; }
+        .offers-table th { font-weight: bold; color: #495057; }
+
+        /* Action Buttons */
+        .action-btns { display: flex; gap: 8px; }
+        .icon-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #6c757d;
+            padding: 6px;
+            border-radius: 4px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header { flex-direction: column; align-items: flex-start; }
+            .search { margin-top: 10px; width: 100%; }
+            .offers-table th, .offers-table td { padding: 10px; font-size: 14px; }
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/sidebar') %>
+
+    <div class="container">
+        <div class="header">
+            <h1>All Offers</h1>
+            <div class="sort">
+                <label for="category" class="sort-label">Sort by category:</label>
+                <select id="category" name="categoryId" class="sort-select">
+                    <option value="">Select</option>
+                    <option value="0">All</option>
+                    <option value="1">Electronics</option>
+                    <option value="2">Fashion</option>
+                    <option value="3">Home & Kitchen</option>
+                    <option value="4">Sports</option>
+                    <option value="5">Books</option>
+                </select>
+            </div>
+            <div class="search">
+                <input type="text" placeholder="Search offers...">
+                <button class="search-btn">Search</button>
+            </div>
+            <button class="add-offer-btn" onclick="window.location.href='/offer-management/add-offer'">Add Offer</button>
+        </div>
+
+        <table class="offers-table">
+            <thead>
+                <tr>
+                    <th>Offer Title</th>
+                    <th>Category / product</th>
+                    <th>Offer Type</th> <!-- New column for Offer Type -->
+                    <th>Discount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% offers.forEach((data) => { %>
+                    <tr>
+                        <td><%= data.details.offerTitle %></td>
+                        <td><%= data.details.category || data.details.product %></td>
+                        <td><%= data.details.offerType %></td> <!-- Descriptive offer type -->
+                        <td><%= data.details.discount %>%</td>
+                        <td><%= data.details.status %></td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="icon-btn" title="View" onclick="window.location.href='/offers/view/<%= data._id %>'"><i class="fas fa-eye"></i></button>
+                                <button class="icon-btn" title="Edit" onclick="window.location.href='/offers/edit/<%= data._id %>'"><i class="fas fa-edit"></i></button>
+                                <button class="icon-btn" title="Delete" onclick="window.location.href='/offers/delete/<%= data._id %>'"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                <% }) %>
+                
+                
+            </tbody>
+        </table>
+    </div>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

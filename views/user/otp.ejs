@@ -151,7 +151,7 @@
                 </div>
                 <div class="resend-otp">
                     <a href="/resend-otp">Resend OTP?</a>
-                    <span class="timer" id="timer">02:00</span> <!-- Timer will update here -->
+                    <span class="timer" id="timer">02:00</span> 
                 </div>
             </div>
         </div>
@@ -159,9 +159,9 @@
 
     <script>
         // Set the countdown time (2 minutes = 120 seconds)
-        let timeLeft = 120;
         const timerElement = document.getElementById("timer");
-
+        const initialTime = 120; ;
+        let timeLeft = localStorage.getItem('remainingTime') ? parseInt(localStorage.getItem('remainingTime')) : initialTime;
         // Function to format time as MM:SS
         function formatTime(seconds) {
             const minutes = Math.floor(seconds / 60);
@@ -169,17 +169,23 @@
             return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
         }
 
-        // Update the countdown every second
         const countdown = setInterval(() => {
             timeLeft--;
+            localStorage.setItem('remainingTime', timeLeft);
             timerElement.textContent = formatTime(timeLeft);
 
-            // When time is up, stop the timer
             if (timeLeft <= 0) {
                 clearInterval(countdown);
-                timerElement.textContent = "00:00"; // Time's up message
+                timerElement.textContent = "00:00"; 
+                localStorage.removeItem('remainingTime'); 
             }
-        }, 1000); // Update every second (1000 milliseconds)
+        }, 1000); 
+
+        function resetOTP() {
+            clearInterval(countdown);
+            localStorage.removeItem('remainingTime'); 
+        }
+
     </script>
 </body>
 </html>

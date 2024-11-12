@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMJqDk3H4z1Agjm7XpsIwhfnF5xEik5aMoX7reB" crossorigin="anonymous">
+    <style>
+          /* Basic reset */
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling */
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        /* Container for the catalog */
+        .container {
+            max-width: 1200px;
+            margin-left: 280px ;
+            padding: 20px;
+        }
+
+        /* Header section */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* Sorting dropdown */
+        .sort {
+            font-size: 16px;
+        }
+
+        /* Search bar */
+        .search {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .search input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+            width: 100%;
+        }
+
+        .search-btn {
+            background-color: #f39c12;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            font-size: 18px;
+            color: #fff;
+            border-radius: 4px;
+        }
+
+        /* Add book button */
+        .add-book-btn {
+            padding: 10px 16px;
+            background-color: #f5b34a;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .add-book-btn:hover {
+            background-color: #70340b;
+        }
+
+        /* Book table styles */
+        .book-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .book-table thead {
+            background-color:  #fcecc3;
+            
+        }
+
+        .book-table th, .book-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .book-table th {
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .book-table td img {
+            width: 50px;
+            height: auto;
+            display: block;
+        }
+
+        .book-table td {
+            vertical-align: middle;
+        }
+
+        /* Action buttons */
+        .icon-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            margin: 0 5px;
+            color: #fbcd82;
+        }
+
+        .icon-btn:hover {
+            color: #5b2a0a;
+        }
+        /* Sort container styling */
+.sort {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px; /* Space between label and dropdown */
+}
+
+/* Label styling */
+.sort-label {
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* Dropdown styling */
+.sort-select {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    color: #333;
+    cursor: pointer;
+    appearance: none; /* Removes default arrow */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="%23333"%3E%3Cpath d="M2 2l3 3 3-3z"/%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+    width: 100%;
+    max-width: 250px; /* Adjust width based on your layout */
+}
+
+/* Hover effect */
+.sort-select:hover {
+    border-color: #f39c12;
+}
+
+/* Focus effect */
+.sort-select:focus {
+    outline: none;
+    border-color: #f39c12;
+    box-shadow: 0 0 5px rgba(243, 156, 18, 0.5);
+}
+
+        /* Footer styling */
+        footer {
+            background-color: #f5f5f5;
+            padding: 40px 0;
+            font-family: 'Poppins', sans-serif;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            color: #777;
+        }
+        .item-table {
+    width: 100%;
+    margin-top: 10px;
+}
+/* General table styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Dropdown styling */
+.status-dropdown {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    color: #333;
+    transition: background-color 0.3s ease;
+}
+
+.status-dropdown:focus {
+    background-color: #e9f7ff;
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Button styling for actions */
+button {
+    padding: 6px 10px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    th, td {
+        padding: 8px;
+        font-size: 12px;
+    }
+    button, .status-dropdown {
+        font-size: 12px;
+        padding: 5px 8px;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <%- include('../partials/sidebar') %>
+    <div class="container">
+        <div class="header">
+            <div class="sort">
+                <label for="orderStatus" class="sort-label">Filter by Status:</label>
+                <select id="orderStatus" name="status" class="sort-select">
+                    <option value="">Select</option>
+                    <option value="All">All</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+
+            <div class="search">
+                <input type="text" placeholder="Search by Order ID or Customer Name">
+                <button class="search-btn" aria-label="Search orders">
+                    <i class="fas fa-search"></i>
+                </button>
+                
+            </div>
+        </div>
+
+        <!-- Orders Table -->
+        <table class="book-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer Name</th>
+                    <th>Order Date</th>
+                    <th>Total Amount</th>
+                    <th>Items</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% orders.forEach(order => { %>
+                    <tr>
+                        <td><%= order._id %></td>
+                        <td><%= order.customerName %></td>
+                        <td><%= order.orderDate %></td>
+                        <td>&#8377; <%= order.totalAmount %></td>
+                        <td>
+                            <table class="item-table">
+                                <thead>
+                                    <tr>
+                                        <th>Book Name</th>
+                                        <th>Quantity</th>
+                                        <th>Status</th>
+                                        <th>change Status</th>
+                                      
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% order.items.forEach(item => { %>
+                                        <tr>
+                                            <td><%= item.bookName %></td>
+                                            <td><%= item.quantity %></td>
+                                            <td id="status-<%= order._id %>-<%= item.bookId %>"><%= item.orderStatus %></td>
+                                            <td>
+                                                <select class="status-dropdown" data-order-id="<%= order._id %>" data-book-id="<%= item.bookId %>" data-user-id="<%= order.userId %>">
+                                                    <option value="Pending">Pending</option>
+                                                    <option value="Shipped">Shipped</option>
+                                                    <option value="Delivered">Delivered</option>
+                                                    <option value="Cancelled">Cancelled</option>
+                                                </select>
+                                            </td>
+                                          
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+
+    
+
+    <script>
+        // Toggle Order Items Visibility
+    document.querySelectorAll('.toggle-items').forEach(button => {
+        button.addEventListener('click', function() {
+            const orderId = this.getAttribute('data-order-id');
+            const itemsRow = document.getElementById(`items-${orderId}`);
+            itemsRow.style.display = itemsRow.style.display === 'none' ? 'table-row' : 'none';
+        });
+    });
+
+        
+
+        // Event Listeners for Action Buttons
+        document.querySelectorAll('.view').forEach(button => {
+            button.addEventListener('click', function() {
+                const orderId = this.value;
+                if (orderId) {
+                    window.location.href = `/orders/view-order?orderId=${orderId}`;
+                }
+            });
+        });
+
+        document.querySelectorAll('.status').forEach(button => {
+            button.addEventListener('click', function() {
+                const orderId = this.value;
+                if (orderId) {
+                    window.location.href = `/orders/change-status?orderId=${orderId}`;
+                }
+            });
+        });
+
+        document.querySelectorAll('.delete').forEach(button => {
+            button.addEventListener('click', function() {
+                const orderId = this.value;
+                if (orderId) {
+                    window.location.href = `/orders/cancel-order?orderId=${orderId}`;
+                }
+            });
+        });
+
+        document.querySelectorAll('.change-item-status').forEach(button => {
+            button.addEventListener('click', function() {
+                const bookId = this.value;
+                const orderId = this.closest('tr').parentNode.parentNode.querySelector('td').innerText;
+                if (bookId) {
+                    window.location.href = `/orders/change-item-status?orderId=${orderId}&bookId=${bookId}`;
+                }
+            });
+        });
+
+        // Filtering orders by status
+        const statusDropdown = document.getElementById('orderStatus');
+        statusDropdown.addEventListener('change', function() {
+            const selectedStatus = this.value;
+            if (selectedStatus) {
+                window.location.href = `/orders?status=${selectedStatus}`;
+            }
+        });
+
+
+        document.querySelectorAll('.status-dropdown').forEach(dropdown => {
+    dropdown.addEventListener('change', function() {
+        const newStatus = this.value;
+        console.log(newStatus);
+        
+        const orderId = this.getAttribute('data-order-id');
+        const bookId = this.getAttribute('data-book-id');
+        const userId = this.getAttribute('data-user-id');
+console.log(bookId,orderId);
+
+        // Send the new status to the server via AJAX
+        fetch('/order-management/change-item-status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ orderId, bookId, userId, status: newStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const statusCell = document.getElementById(`status-${orderId}-${bookId}`);
+            statusCell.textContent = newStatus;
+                alert('Status updated successfully');
+            } else {
+                alert('Failed to update status');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
+
+
+    </script>
+</body>
+</html>
