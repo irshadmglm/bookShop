@@ -13,7 +13,7 @@ module.exports = {
     addCoupon: (req,res)=>{
         console.log(req.body);
         couponManagementHelper.addCoupon(req.body).then((response)=>{
-            res.redirect('/coupon-management');
+            res.redirect('/admin/coupon-management');
         })
         
     }

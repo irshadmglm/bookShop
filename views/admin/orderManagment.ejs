@@ -340,7 +340,7 @@ button {
             button.addEventListener('click', function() {
                 const orderId = this.value;
                 if (orderId) {
-                    window.location.href = `/orders/view-order?orderId=${orderId}`;
+                    window.location.href = `/admin/orders/view-order?orderId=${orderId}`;
                 }
             });
         });
@@ -349,7 +349,7 @@ button {
             button.addEventListener('click', function() {
                 const orderId = this.value;
                 if (orderId) {
-                    window.location.href = `/orders/change-status?orderId=${orderId}`;
+                    window.location.href = `/admin/orders/change-status?orderId=${orderId}`;
                 }
             });
         });
@@ -358,7 +358,7 @@ button {
             button.addEventListener('click', function() {
                 const orderId = this.value;
                 if (orderId) {
-                    window.location.href = `/orders/cancel-order?orderId=${orderId}`;
+                    window.location.href = `/admin/orders/cancel-order?orderId=${orderId}`;
                 }
             });
         });
@@ -368,7 +368,7 @@ button {
                 const bookId = this.value;
                 const orderId = this.closest('tr').parentNode.parentNode.querySelector('td').innerText;
                 if (bookId) {
-                    window.location.href = `/orders/change-item-status?orderId=${orderId}&bookId=${bookId}`;
+                    window.location.href = `/admin/orders/change-item-status?orderId=${orderId}&bookId=${bookId}`;
                 }
             });
         });
@@ -378,7 +378,7 @@ button {
         statusDropdown.addEventListener('change', function() {
             const selectedStatus = this.value;
             if (selectedStatus) {
-                window.location.href = `/orders?status=${selectedStatus}`;
+                window.location.href = `/admin/orders?status=${selectedStatus}`;
             }
         });
 
@@ -394,7 +394,7 @@ button {
 console.log(bookId,orderId);
 
         // Send the new status to the server via AJAX
-        fetch('/order-management/change-item-status', {
+        fetch('/admin/order-management/change-item-status', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

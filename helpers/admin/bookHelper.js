@@ -394,5 +394,166 @@ module.exports = {
             }
         });
     },
+    //  bestSelling : function(type) {
+    //     return new Promise(async (resolve, reject) => {
+    //         try {
+    //             const dbInstance = db.get().collection(collections.ORDER_COLLECTION);
+    
+                
+    //             let pipeline = [
+    //                 { $unwind: "$items" },
+    //                 { $match: { "items.orderStatus": "Delivered" } }
+    //             ];
+    
+    //             if (type === "products") { 
+                   
+    //                 pipeline.push(
+    //                     {
+    //                         $group: {
+    //                             _id: "$items.bookId",
+    //                             bookName: { $first: "$items.bookName" },
+    //                             authorName: { $first: "$items.authorName" },
+    //                             totalSold: { $sum: "$items.quantity" },
+                                
+    //                         }
+    //                     },
+    //                     { $sort: { totalSold: -1 } },
+    //                     { $limit: 10 }
+    //                 );
+    //             } else if (type === "categories") {
+                    
+    //                 pipeline.push(
+    //                     {
+    //                         $group: {
+    //                             _id: "$items.category",
+    //                             totalSold: { $sum: "$items.quantity" }
+    //                         }
+    //                     },
+    //                     { $sort: { totalSold: -1 } },
+    //                     { $limit: 10 }
+    //                 );
+    //             } else {
+    //                 // Invalid type
+    //                 return reject("Invalid type! Use 'products' or 'categories'.");
+    //             }
+    
+    //             // Execute the pipeline
+    //             const books = await dbInstance.aggregate(pipeline).toArray();
+
+    //             let categories = await this.getCategories();
+
+    //             resolve([books, categories]);
+    //         } catch (error) {
+    //             console.error("Error fetching best-selling data:", error);
+    //             reject(error);
+    //         }
+    //     });
+    // },
+    bestSelling: function (type) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const dbInstance = db.get().collection(collections.ORDER_COLLECTION);
+                let pipeline = [
+                    { $unwind: "$items" },
+                    { $match: { "items.orderStatus": "Delivered" } },
+                    {
+                        $addFields: {
+                            "items.bookId": { $toObjectId: "$items.bookId" }, // Convert bookId to ObjectId
+                        }
+                    }
+                ];
+    
+                if (type === "products") {
+                    pipeline.push(
+                        {
+                            $group: {
+                                _id: "$items.bookId",
+                                totalSold: { $sum: "$items.quantity" }
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: "books",
+                                localField: "_id",
+                                foreignField: "_id",
+                                as: "bookDetails"
+                            }
+                        },
+                        { $unwind: "$bookDetails" }, // Flatten bookDetails array
+                        {
+                            $replaceRoot: {
+                                newRoot: {
+                                    _id: "$_id",
+                                    totalSold: "$totalSold",
+                                    bookDetails: "$bookDetails.bookDetails", // Access nested bookDetails
+                                    bookMeta: {
+                                        average_rating: "$bookDetails.average_rating",
+                                        total_ratings: "$bookDetails.total_ratings",
+                                        rating_sum: "$bookDetails.rating_sum"
+                                    }
+                                }
+                            }
+                        },
+                        { $sort: { totalSold: -1 } },
+                        { $limit: 10 }
+                    );
+    
+                    // Execute pipeline for products
+                    const books = await dbInstance.aggregate(pipeline).toArray();
+                    console.log("Top 10 Best-Selling Products: ", books);
+                    let categories = await this.getCategories();
+
+                 
+                    return resolve([books, categories]);
+                } else if (type === "categories") {
+                    pipeline.push(
+                        {
+                            $group: {
+                                _id: "$items.category", // Group by category
+                                totalSold: { $sum: "$items.quantity" }
+                            }
+                        },
+                        { $sort: { totalSold: -1 } },
+                        { $limit: 10 },
+                        {
+                            $lookup: {
+                                from: "categories", // Join with categories collection
+                                localField: "_id",
+                                foreignField: "categoryData.categoryName",
+                                as: "categoryData"
+                            }
+                        },
+
+                        {
+                            $project: {
+                                _id: 1,
+                                totalSold: 1,
+                                categoryData: 1
+                                
+                            
+                            }
+                        }
+                    )
+    
+                    // Execute pipeline for categories
+                    const category = await db
+                        .get()
+                        .collection(collections.ORDER_COLLECTION)
+                        .aggregate(pipeline)
+                        .toArray();
+    
+                    console.log("Top 10 Best-Selling Categories: ", category);
+                    return resolve(category);
+                } else {
+                    return reject("Invalid type! Use 'products' or 'categories'.");
+                }
+            } catch (error) {
+                console.error("Error fetching best-selling data:", error);
+                reject(error);
+            }
+        });
+    }
+    
+    
 
 }

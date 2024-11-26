@@ -5,7 +5,7 @@ const booksMngController = require('../../controllers/admin/booksMngController')
 
 router.get('/', booksMngController.getBooks)
 
-router.get('/add-book', booksMngController.getCategories)
+router.get('/add-book', booksMngController.addbookForm)
 
 router.post('/add-book', booksMngController.addBook);
 
@@ -37,6 +37,10 @@ router.get('/deleted-category', booksMngController.getDeletedCategories);
 
 router.get('/recover-category', booksMngController.recoverCategory);
 
+router.get('/best-selling', booksMngController.bestSelling);
+
 router.get('/filter', booksMngController.filter)
+
+router.get('/search', booksMngController.search)
 
 module.exports = router;

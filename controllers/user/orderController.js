@@ -14,7 +14,8 @@ module.exports = {
         const userId = req.session.user._id;
        userHelper.userAddress(userId).then((address)=>{
         cartHelper.getUserCart(userId).then((cart)=>{
-        res.render('user/checkout',{address,totalPrice:cart.totalPrice})
+            let totalPrice = cart.totalPrice - cart.couponDeduction;
+        res.render('user/checkout',{address,totalPrice})
         })
        })
     },
@@ -51,18 +52,25 @@ module.exports = {
         
          
         const cart = await cartHelper.getUserCart(userId);
+        console.log("CART: ", cart);
+        
+       if(cart){
         const items = cart.items;
         const totalPrice = cart.totalPrice;
+        const couponDeduction = cart.couponDeduction;
+        console.log(couponDeduction,"coooooooooooooooopon");
+        
         console.log("paymentMethod ",paymentMethod);
-        orderHelper.placeOrder(userId, addressId, items, totalPrice, paymentMethod ).then((response)=>{
-                console.log(response);
-                res.status(200).json({ message: response, success: true });
+        orderHelper.placeOrder(userId, addressId, items, totalPrice, paymentMethod, couponDeduction ).then(({message,orderId})=>{
+                
+                res.status(200).json({ message: message, orderId, items, success: true });
                 
             }).catch((error)=>{
                 console.log(error);
                 res.status(500).json({ message: error || 'An unexpected error occurred' });
                 
             })
+       }
     },
     directCheckout:async(req,res)=>{
         const userId = req.session.user._id;
@@ -129,5 +137,10 @@ module.exports = {
         console.error(err);
         res.status(500).json({ success: false });
     });
+    },
+    seccess: (req,res)=>{
+        console.log(" it sis ifsdlfjslgnjfghsdlkfjgh");
+        
+        res.render('user/orderSuccess');
     }
 }

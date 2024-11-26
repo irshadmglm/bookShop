@@ -99,7 +99,9 @@ module.exports = {
     getWishlistIds:(userId)=>{
         return new Promise(async(resolve,reject)=>{
           let wishList = await db.get().collection(collections.WISHLIST_COLLECTION).findOne({userId: new ObjectId(userId)})
-          resolve(wishList.books);
+         if(wishList){
+            resolve(wishList.books);
+         }
         })
     }
     

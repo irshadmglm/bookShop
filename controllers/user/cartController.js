@@ -16,17 +16,17 @@ module.exports = {
         const {bookId} = req.body;
         cartHelper.addToCart(bookId,req.session.user._id).then((response)=>{
             res.status(200).json({ message: response, success: true });
-        }).catch((error) => {
-            console.error("Router error:", error);
-            res.status(500).json({ message: error, success: false });
-          });
+        }) .catch((err) => {
+            console.log("Router error:", err);
+            res.status(500).json({ message: err || 'An error occurred', success: false });
+        });
     },
     removeFromCart: (req,res)=>{
         const {bookId} = req.body;
         cartHelper.removeFromCart(bookId,req.session.user._id).then((response)=>{
             res.status(200).json({ message: response, success: true });
         }).catch((err)=>{
-            res.status(500).json({ message: error.message, success: false });
+            res.status(500).json({ message: err.message, success: false });
         })
     },
     changeQuantity: (req, res) => {

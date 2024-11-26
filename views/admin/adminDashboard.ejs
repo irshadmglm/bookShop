@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales Report Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMR3Efiw2JHOjNBMO5h7jokWKejiWUVgEjfYFlQ" crossorigin="anonymous">
+  <style>
+    /* General Styles */
+    body {
+      background-color: #fffbf3;
+      color: #5d482f;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+     
+      height: 100vh;
+    }
+  
+    .dashboard-container {
+      background-color: #fffbf3;
+      padding: 20px;
+      border-radius: 10px;
+      width: 70%;
+      max-width: 1200px;
+      margin-left: 270px;
+    }
+  
+    header h1 {
+      font-size: 2rem;
+      color: #5d482f;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+  
+    .filter-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+  
+    .filter-section label {
+      font-weight: bold;
+    }
+  
+    .filter-section select,
+    .filter-section input,
+    .generate-btn {
+      padding: 8px 12px;
+      font-size: 1rem;
+      border: 1px solid #542a05;
+      border-radius: 5px;
+      background-color: #fffbf3;
+      color: #422105;
+    }
+  
+    .generate-btn {
+      background-color: #542a05;
+      color: #fffbf3;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+  
+    .generate-btn:hover {
+      background-color: #7c6742;
+    }
+  
+    .main-content {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+  
+    .metrics {
+      flex: 1;
+      display: grid;
+      grid-template:  150px 150px /  180px 180px  ;
+      gap: 15px;
+    }
+  
+    .metric-card {
+      background-color: #ffd38d;
+      color: #563310;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      transition: transform 0.2s;
+    }
+    .metric-card:nth-child(1) {
+  background-color: #ffd38d; /* Primary project color */
+}
+
+.metric-card:nth-child(2) {
+  background-color: #ffc074; /* Warm orange for consistency */
+}
+
+.metric-card:nth-child(3) {
+  background-color: #d1eaa3; /* Soft green for balance */
+}
+
+.metric-card:nth-child(4) {
+  background-color: #c0e3ed; /* Gentle blue for calmness */
+}
+    .metric-card:hover {     
+      transform: scale(1.05);
+    }
+  
+    .metric-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+  
+    .metric-card p {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+  
+    .chart-container {
+      flex: 1;
+      min-width: 330px;
+      background-color: #f8f5f1;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+  
+    .download-section {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 30px;
+    }
+  
+    .download-btn {
+      background-color: #34210a;
+      color: #fffbf3;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: background-color 0.2s;
+    }
+  
+    .download-btn:hover {
+      background-color: #e4c48d;
+      color: #422105;
+    }
+  
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .main-content {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+    <%- include('../partials/sidebar') %>
+
+
+
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="dashboard-container">
+  <header>
+    <h1><i class="fas fa-chart-line"></i> Sales Report Dashboard</h1>
+    <div class="filter-section">
+      <label for="report-type">Report Type:</label>
+      <select id="report-type" onchange="updateChart()">
+        <option value="day">1 Day</option>
+        <option value="week">1 Week</option>
+        <option value="month">1 Month</option>
+        <option value="year">1 Year</option>
+        <option value="custom">Custom Date Range</option>
+      </select>
+      <input type="date" id="start-date" class="date-input" style="display: none;">
+      <input type="date" id="end-date" class="date-input" style="display: none;">
+      <button onclick="generateReport()" class="generate-btn">
+        <i class="fas fa-sync-alt"></i> Generate Report
+      </button>
+    </div>
+  </header>
+<% if(report){ %>
+  <div class="main-content">
+    <section class="metrics">
+      <div class="metric-card">
+        <h3><i class="fas fa-shopping-cart"></i> Overall Sales Count</h3>
+        <p id="sales-count"><%= report.overallSalesCount || 0 %></p>
+      </div>
+      <div class="metric-card">
+        <h3><i class="fas fa-dollar-sign"></i> Total Revenue</h3>
+        <p id="total-revenue">₹<%= report.totalRevenue || 0 %></p>
+      </div>
+      <div class="metric-card">
+        <h3><i class="fas fa-tags"></i> Total Discount</h3>
+        <p id="total-discount">₹<%= report.totalDiscount || 0 %></p>
+      </div>
+      <div class="metric-card">
+        <h3><i class="fas fa-percentage"></i> Coupons Deduction</h3>
+        <p id="coupons-deduction">₹<%= report.totalCouponDeduction || 0 %></p>
+      </div>
+    </section>
+
+    <section class="chart-container">
+      <canvas id="salesChart"></canvas>
+    </section>
+  </div>
+  <% } else{ %>
+    <div class="main-content">
+      <section class="metrics">
+        <div class="metric-card">
+          <h3><i class="fas fa-shopping-cart"></i> Overall Sales Count</h3>
+          <p id="sales-count">0</p>
+        </div>
+        <div class="metric-card">
+          <h3><i class="fas fa-dollar-sign"></i> Total Revenue</h3>
+          <p id="total-revenue">₹ 0</p>
+        </div>
+        <div class="metric-card">
+          <h3><i class="fas fa-tags"></i> Total Discount</h3>
+          <p id="total-discount">₹ 0</p>
+        </div>
+        <div class="metric-card">
+          <h3><i class="fas fa-percentage"></i> Coupons Deduction</h3>
+          <p id="coupons-deduction">₹ 0</p>
+        </div>
+      </section>
+  
+      <section class="chart-container">
+        <canvas id="salesChart"></canvas>
+      </section>
+    </div>
+    <% } %>
+
+  <section class="download-section">
+    <button onclick="downloadReport('pdf')" class="download-btn"><i class="fas fa-file-pdf"></i> Download PDF</button>
+    <button onclick="downloadReport('excel')" class="download-btn"><i class="fas fa-file-excel"></i> Download Excel</button>
+  </section>
+</div>
+
+
+  <script>
+    let salesChart;
+
+    function downloadReport(format) {
+            if(format == 'pdf'){
+                window.location.href = `/admin/admin-dashboard/download/pdf`;
+            }else if(format === 'excel'){
+                window.location.href = `/admin/admin-dashboard/download/excel`;
+            }
+                }
+
+      
+
+
+                async function generateReport() {
+  const reportType = document.getElementById("report-type").value;
+  const startDate = document.getElementById("start-date").value;
+  const endDate = document.getElementById("end-date").value;
+
+  // Fetch the filtered report data from the server
+  const response = await fetch(`/admin/admin-dashboard/sales-report/${reportType}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ reportType, startDate, endDate }),
+  });
+
+  const data = await response.json();
+console.log(data);
+
+  // Update DOM elements with fetched data
+  document.getElementById("sales-count").textContent = data.overallSalesCount || 0;
+  document.getElementById("total-revenue").textContent = `₹${data.totalRevenue || 0}`;
+  document.getElementById("total-discount").textContent = `₹${data.totalDiscount || 0}`;
+  document.getElementById("coupons-deduction").textContent = `₹${data.couponDeduction || 0}`;
+
+  // Update the chart with new data
+  updateChart(data);
+}
+
+function updateChart(chartData) {
+  const ctx = document.getElementById("salesChart").getContext("2d");
+
+  // Destroy existing chart if it exists
+  if (salesChart) {
+    salesChart.destroy();
+  }
+
+  // Create a new chart
+  salesChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Sales Count', 'Total Revenue', 'Total Discount', 'Coupons Deduction'],
+      datasets: [{
+        label: '# Value',
+        data: [
+          chartData.overallSalesCount || 0,
+          chartData.totalRevenue || 0,
+          chartData.totalDiscount || 0,
+          chartData.couponDeduction || 0
+        ],
+        backgroundColor: ['#ffd38d', '#ffc074', '#d1eaa3', '#c0e3ed'],
+        borderWidth: 1,
+      }],     
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+    },
+  });
+}
+
+document.getElementById("report-type").addEventListener("change", (e) => {
+  const value = e.target.value;
+  const startDate = document.getElementById("start-date");
+  const endDate = document.getElementById("end-date");
+
+  if (value === "custom") {
+    startDate.style.display = "inline";
+    endDate.style.display = "inline";
+  } else {
+    startDate.style.display = "none";
+    endDate.style.display = "none";
+  }
+});
+
+ let overallSalesCount = document.getElementById("sales-count").textContent;
+ let totalRevenue = document.getElementById("total-revenue").textContent.replace("₹", "");
+ let totalDiscount = document.getElementById("total-discount").textContent.replace("₹", "");
+ let couponDeduction = document.getElementById("coupons-deduction").textContent.replace("₹", ""); 
+// Initial chart load
+document.addEventListener("DOMContentLoaded", () => {
+  updateChart({
+    overallSalesCount: overallSalesCount,
+    totalRevenue: totalRevenue,
+    totalDiscount: totalDiscount,
+    couponDeduction: couponDeduction,
+});
+
+});
+
+  </script>
+</body>
+</html>

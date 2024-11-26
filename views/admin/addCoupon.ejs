@@ -87,7 +87,7 @@
     <%- include('../partials/sidebar') %>
 
 <div class="form-container">
-    <form action="/coupon-management/add-coupon" method="post">
+    <form action="/admin/coupon-management/add-coupon" method="post">
         <div class="form-grid">
             <div class="form-group">
                 <input type="text" id="coupon_code" name="coupon_code" hidden>
@@ -96,7 +96,7 @@
             </div>
             <div class="form-group">
                 <label for="discount_type">Discount Type</label>
-                <select id="discount_type" name="discount_type">
+                <select id="discount_type" name="discount_type" required>
                     <option value="percentage">Percentage</option>
                     <option value="fixed_amount">Fixed Amount</option>
                     <option value="free_shipping">Free Shipping</option>
@@ -104,35 +104,35 @@
             </div>
             <div class="form-group">
                 <label for="discount_value">Discount Value</label>
-                <input type="number" id="discount_value" name="discount_value" placeholder="Discount Value (e.g., 10 for 10%)">
+                <input type="number" id="discount_value" name="discount_value" min="0" placeholder="Discount Value (e.g., 10 for 10%)" required>
             </div>
             <div class="form-group">
                 <label for="max_discount">Max Discount</label>
-                <input type="number" id="max_discount" name="max_discount" placeholder="Max Discount Amount">
+                <input type="number" id="max_discount" name="max_discount" min="0" placeholder="Max Discount Amount" required>
             </div>
             <div class="form-group">
                 <label for="min_purchase">Minimum Purchase</label>
-                <input type="number" id="min_purchase" name="min_purchase" placeholder="Minimum Purchase Amount">
+                <input type="number" id="min_purchase" name="min_purchase" min="0" placeholder="Minimum Purchase Amount" required>
             </div>
             <div class="form-group">
                 <label for="valid_from">Valid From</label>
-                <input type="date" id="valid_from" name="valid_from">
+                <input type="date" id="valid_from" name="valid_from" required>
             </div>
             <div class="form-group">
                 <label for="valid_to">Valid To</label>
-                <input type="date" id="valid_to" name="valid_to">
+                <input type="date" id="valid_to" name="valid_to" required>
             </div>
             <div class="form-group">
                 <label for="usage_limit">Usage Limit</label>
-                <input type="number" id="usage_limit" name="usage_limit" placeholder="Total Usage Limit">
+                <input type="number" id="usage_limit" name="usage_limit" placeholder="Total Usage Limit" min="1" required>
             </div>
             <div class="form-group">
                 <label for="per_user_limit">Per User Limit</label>
-                <input type="number" id="per_user_limit" name="per_user_limit" placeholder="Usage Limit Per User">
+                <input type="number" id="per_user_limit" name="per_user_limit" min="1" placeholder="Usage Limit Per User" required>
             </div>
             <div class="form-group">
                 <label for="status">Status</label>
-                <select id="status" name="status">
+                <select id="status" name="status" required>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                 </select>

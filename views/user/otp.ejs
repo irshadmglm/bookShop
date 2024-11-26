@@ -140,7 +140,7 @@
                 <h2>OTP Verification</h2>
                 <p ><%= message || ' ' %></p>
                 <div class="otp-inputs">
-                    <form action="/verify-otp" method="post">
+                    <form action="/user/verify-otp" method="post">
                         <input type="text" maxlength="1" name="otp[]" required>
                         <input type="text" maxlength="1" name="otp[]" required>
                         <input type="text" maxlength="1" name="otp[]" required>
@@ -150,7 +150,7 @@
                     </form>
                 </div>
                 <div class="resend-otp">
-                    <a href="/resend-otp">Resend OTP?</a>
+                    <a href="/user/resend-otp" onclick="resetTimer()">Resend OTP?</a>
                     <span class="timer" id="timer">02:00</span> 
                 </div>
             </div>
@@ -181,7 +181,7 @@
             }
         }, 1000); 
 
-        function resetOTP() {
+        function resetTimer() {
             clearInterval(countdown);
             localStorage.removeItem('remainingTime'); 
         }

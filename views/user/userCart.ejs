@@ -257,6 +257,20 @@
             color: red;
             font-weight: bold;
         }
+        .price {
+        margin: 5px 0;
+    }
+    .price .current-price {
+        font-size: 16px;
+        font-weight: bold;
+        color: #5d1d05;
+    }
+    .price .original-price {
+        text-decoration: line-through;
+        margin-left: 10px;
+        color: gray;
+        font-size: 14px;
+    }
     </style>
 </head>
 
@@ -268,8 +282,7 @@
             <div class="head">
                 <span class="cart-icon"><i class="fas fa-shopping-cart"></i></span>
                 <span class="cart-label">cart</span>
-                <span class="cart-count">
-                    
+                <span class="cart-count" id="cart-count">
                     <%= items.items.reduce((acc, item)=> item.quantity + acc, 0) || '' %>
                 </span>
             </div>
@@ -295,7 +308,18 @@
                                 <p><strong>Category:</strong>
                                     <%= item.category || ' ' %>
                                 </p>
-                                <p class="price">₹<%= item.subtotal || ' ' %>/-</p>
+                                <div class="price">
+                                    <span class="current-price">
+                                        ₹<%= item.subtotal || ' ' %>/-
+                                    </span>
+                                    <% if(item.discountValue) { %>
+                                        <span class="original-price">
+                                            ₹<%= item.actualPrice || ' ' %>/-
+                                        </span>
+                                        <% } %>
+                                </div>
+
+
                                 <p class="<%= item.stockCount > 0 ? 'in-stock' : 'out-of-stock' %>">
                                     <%= item.stockCount> 0 ? 'In Stock' : 'Out of Stock' %>
                                 </p>
@@ -305,11 +329,12 @@
                                 <div class="controls">
                                     <button value="<%= item.bookId %>" class="remove-btn">Remove</button>
                                     <div class="quantity-controls">
-                                        <button class="quantity" value="<%= item.bookId %>,-1,<%= item.quantity %>">-</button>
+                                        <button class="quantity" value="<%= item.bookId %>,-1,<%= item.quantity%>,-<%= item.price %>,-<%= item.discountValue %>">-</button>
                                         <div class="quantity-display">
                                             <%= item.quantity || ' ' %>
                                         </div>
-                                        <button class="quantity" value="<%= item.bookId %>,1,<%= item.quantity %>">+</button>
+                                        <button class="quantity" value="<%= item.bookId %>,1,<%= item.quantity %>,<%= item.price%>,<%= item.discountValue %>">+</button>
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -331,13 +356,18 @@
                         <p><strong>Number of books:</strong> <span>
                                 <%= items.items.length || ' '%>
                             </span></p>
-                        <p><strong>Price:</strong> <span>
-                                <%= items.totalPrice || ' ' %>/-
+                        <p><strong>Price:</strong> <span id="total-price">
+                                <%= items.totalDiscount ? items.totalPrice + items.totalDiscount : items.totalPrice  || '0' %>/-
                             </span></p>
                         <p><strong>Delivery Charges:</strong> <span>0</span></p>
-                        <p><strong>Discount:</strong> <span class="discount">0</span></p>
-                        <p><strong>Sub Total:</strong> <span class="subtotal">
-                                <%= items.totalPrice || ' ' %>/-
+                        <p><strong>Discount:</strong> <span id="discount">
+                            <%= items.totalDiscount  || '0' %>/-
+                        </span></p>
+                        <p><strong>Coupons Deduction:</strong> <span id="coupons-deduction">
+                            0
+                        </span></p>
+                        <p><strong>Sub Total:</strong> <span id="subtotal">
+                                <%= items.totalPrice || '0' %>/-
                             </span></p>
                         <button id="order-button" class="order-button">Place to order</button>
 
@@ -365,7 +395,7 @@
                             const quantityString = quantityDisplay.textContent;
                             const quantity = Number(quantityString);
                             const cartItem = button.closest('.cart-item-container');
-                            fetch('/user-cart/remove-from-cart', {
+                            fetch('/user/user-cart/remove-from-cart', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ bookId })
@@ -381,6 +411,8 @@
                                             cartItem.remove();
 
                                         }, 500);
+                                        let cartCount = document.getElementById('cartcount');
+                            cartCount.textContent = Number(cartCount.textContent) - 1;
                                     }
                                 })
                                 .catch(error => {
@@ -397,9 +429,24 @@
                             const cartItem = button.closest('.cart-item-container');
                             const quantityString = quantityDisplay.textContent;
                             const quantity = Number(quantityString);
+                            const cartCountElement = document.getElementById('cart-count');
+                            let currentCount = Number(cartCountElement.textContent);
+                            let totalPriceElement = document.getElementById('total-price');
+                            let totalPrice = parseFloat(totalPriceElement.textContent);
+                            let totalDiscountAmountElement =  document.getElementById('discount')
+                            let totalDiscountAmount = parseFloat(totalDiscountAmountElement.textContent)
+                            let subTotalPriceElement = document.getElementById('subtotal')
+                            let subTotalPrice = parseFloat(subTotalPriceElement.textContent)
+                            
+                            console.log(arr);
+                            
                             const bookId = arr[0];
-                            const count = Number(arr[1]);
-                            fetch('/user-cart/change-quantity', {
+                            const count = parseFloat(arr[1]);
+                            const bookPrice = parseFloat(arr[3]);
+                            const discountValue = parseFloat(arr[4]);
+                            
+                            
+                            fetch('/user/user-cart/change-quantity', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ bookId, count })
@@ -412,7 +459,13 @@
                                 })
                                 .then(data => {
                                     if (data.success) {
+                                        console.log(data);
+                                        
                                         quantityDisplay.textContent = quantity + count;
+                                        cartCountElement.textContent = currentCount += count;
+                                        totalPriceElement.textContent = totalPrice += bookPrice;
+                                        totalDiscountAmountElement = totalDiscountAmount += discountValue;
+                                        subTotalPriceElement = subTotalPrice += bookPrice - Math.abs(discountValue);
                                         if(data.message == "Item removed from cart successfully" ){
                                             cartItem.style.transition = "opacity 0.5s ease";
                                             cartItem.style.opacity = 0;
@@ -451,7 +504,7 @@
                     }
 
                     document.getElementById('order-button').addEventListener('click',()=>{
-                    window.location.href = `/order/check-out`;
+                    window.location.href = `/user/order/check-out`;
                     })
 
 
@@ -460,7 +513,7 @@
                         const couponCode = document.getElementById('coupon-code').value.trim();
 
                         if (couponCode) {
-                            fetch('/coupons/apply-coupon', {
+                            fetch('/user/coupons/apply-coupon', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ couponCode })
@@ -468,8 +521,10 @@
                             .then(response => response.json())
                             .then(data => { 
                                 if (data.success) {
-                                    document.querySelector('.discount').textContent = data.discountAmount;
-                                    document.querySelector('.subtotal').textContent = data.newTotalPrice + '/-';
+                                    console.log(data);
+                                    
+                                    document.querySelector('#coupons-deduction').textContent = data.couponDeduction + '/-';
+                                    document.querySelector('#subtotal').textContent = data.newTotalPrice + '/-';
                                     showToast('coupon applied');
                                 } else {
                                     showToast(data.message || 'Coupon application failed.');

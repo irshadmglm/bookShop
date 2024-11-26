@@ -68,6 +68,8 @@ module.exports = {
   },
   doLogin: (userDetails) => {
     return new Promise(async (resolve, reject) => {
+      console.log(userDetails);
+      
       try {
         let user = await db.get().collection(collections.USER_COLLECTION).findOne({ email: userDetails.email, isBlocked: false });
         if (user) {

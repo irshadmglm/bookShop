@@ -14,7 +14,7 @@ module.exports = {
         userManagementHelper.changeStatus(req.query.userId).then((response)=>{
             console.log(response);
             
-            res.redirect('/user-management')
+            res.redirect('/admin/user-management')
         })
     }
 }

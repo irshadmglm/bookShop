@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Success</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #fffcf4;
+        }
+
+        /* Container styling */
+        .success-container {
+            width: 400px;
+            text-align: center;
+            padding: 20px;
+            background-color: #fff0c7;
+            border-radius: 20px;
+        }
+
+        .icon {
+            font-size: 80px;
+            color: #28a745;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        /* Animation styling */
+        .icon i {
+            opacity: 0;
+            transform: scale(0.5);
+            animation: checkmarkAppear 0.8s ease-out forwards;
+        }
+
+        @keyframes checkmarkAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+
+        .button:hover {
+            background-color: #218838;
+        }
+
+        .order-summary {
+            margin-top: 15px;
+            text-align: left;
+            color: #555;
+        }
+
+        .order-summary h4 {
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .order-summary p {
+            font-size: 14px;
+            margin: 4px 0;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="success-container">
+    <!-- Success Icon -->
+    <div class="icon">
+        <i class="fas fa-check-circle"></i>
+    </div>
+
+    <!-- Success Message -->
+    <h2>Order Successful!</h2>
+    <p>Thank you for your purchase. Your order has been placed successfully.</p>
+    
+    <!-- Order Summary -->
+    <!-- <div class="order-summary">
+        <h4>Order Details:</h4>
+        <p><strong>Order ID:</strong> #12345</p>
+        <p><strong>Total Amount:</strong> ₹1500</p>
+    </div> -->
+    
+    <!-- Go Back or Home Button -->
+    <a href="/user" class="button">Go to Homepage</a>
+</div>
+
+<script>
+                 setTimeout(() => {
+                   window.location.href = window.location.href = '/user'; 
+                }, 3000);
+</script>
+</body>
+</html>

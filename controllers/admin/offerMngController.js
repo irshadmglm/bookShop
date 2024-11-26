@@ -15,7 +15,7 @@ module.exports = {
     },
     addOffer: (req,res)=>{
         offerMngHelper.addOffer(req.body).then(()=>{
-            res.redirect('/offer-management')
+            res.redirect('/admin/offer-management')
         })
     }
 }

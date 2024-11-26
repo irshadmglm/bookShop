@@ -7,6 +7,7 @@ module.exports = {
   getUserCart: (userId) => {
     return new Promise(async (resolve, reject) => {
       try {
+
         const userCart = await db.get().collection(collections.USER_CART_COLLECTION).aggregate([
           {
             $match: { userId: new ObjectId(userId), status: "active" }
@@ -33,6 +34,8 @@ module.exports = {
               updatedAt: { $first: "$updatedAt" },
               totalQuantity: { $first: "$totalQuantity" },
               totalPrice: { $first: "$totalPrice" },
+              totalDiscount: { $first: "$totalDiscount" },
+              couponDeduction: { $first: "$couponDeduction" },
               items: {
                 $push: {
                   bookId: "$items.bookId",
@@ -40,15 +43,19 @@ module.exports = {
                   authorName: "$items.authorName",
                   category: "$items.category",
                   price: "$items.price",
+                  actualPrice: "$items.actualPrice",
                   coverImageName: "$items.coverImageName",
                   quantity: "$items.quantity",
                   subtotal: "$items.subtotal",
-                  stockCount: "$items.stockCount"
+                  stockCount: "$items.stockCount",
+                  discountValue: "$items.discountValue"
                 }
               }
             }
           }
         ]).toArray();
+
+
 
         resolve(userCart[0] || null);
       } catch (error) {
@@ -62,17 +69,23 @@ module.exports = {
       try {
         const bookDetails = await db.get().collection(collections.BOOK_COLLECTION).findOne({
           _id: new ObjectId(bookId),
-          is_deleted: { $ne: true }
+          is_deleted: { $ne: true },
+          'bookDetails.stock': {$gt : 0}
         });
 
         if (!bookDetails) {
-          console.log("Book not found or has been deleted");
-          reject("Book not found or has been deleted");
+          console.log("This Book not available");
+         return reject("This Book not available");
         }
-        const { book_name, categoryId, author_name, price, coverImageName, stock } = bookDetails.bookDetails;
+        const { book_name, categoryId, author_name, price, coverImageName, stock, discount = 0 } = bookDetails.bookDetails;
         const categorydetails = await getCategory(categoryId);
         const category = categorydetails.categoryData.categoryName;
-        const bookPrice = parseFloat(price)
+        const actualPrice = parseFloat(price)
+        const discountValue = (actualPrice * discount /100);
+        const bookPrice = discount  ? actualPrice - discountValue : actualPrice;
+
+        console.log(actualPrice, discountValue, bookPrice ,discount);
+
         stockCount = parseInt(stock);
 
         const userCart = await db.get().collection(collections.USER_CART_COLLECTION).findOne(
@@ -84,34 +97,49 @@ module.exports = {
         if (item && item.quantity >= stockCount) {
           return reject("Cannot add more of this book to the cart; exceeds available stock");
         }
+        const maxQtyPerPerson = 5; 
+            if ( item && item.quantity >= maxQtyPerPerson) {
+               reject(`You can only add up to ${maxQtyPerPerson} units of this product to your cart`);
+               return true; 
+            }
 
 
         let cart = await db.get().collection(collections.USER_CART_COLLECTION).updateOne(
           { userId: new ObjectId(userId), "items.bookId": new ObjectId(bookId), "status": "active" , "items.quantity": { $lt: stockCount } },
           {
-            $inc: { "items.$.quantity": 1, "items.$.subtotal": bookPrice, totalQuantity: 1, totalPrice: bookPrice },
+            $inc: { "items.$.quantity": 1,
+                   "items.$.subtotal": bookPrice,
+                    "items.$.actualPrice": actualPrice,
+                    "items.$.price": actualPrice,
+                    "items.$.discountValue": discountValue,
+                    totalQuantity: 1,
+                    totalPrice: bookPrice,
+                    totalDiscount: discountValue
+                  },
             $set: { updatedAt: new Date() }
           }
         )
 
         if (cart.matchedCount === 0) {
           await db.get().collection(collections.USER_CART_COLLECTION).updateOne(
-            { userId: new ObjectId(userId), status: "active" },
+            { userId: new ObjectId(userId), status: "active", },
             {
               $setOnInsert: { createdAt: new Date() },
               $set: { updatedAt: new Date() },
-              $inc: { totalQuantity: 1, totalPrice: bookPrice },
+              $inc: { totalQuantity: 1, totalPrice: bookPrice, totalDiscount: discountValue },
               $addToSet: {
                 items: {
                   bookId: new ObjectId(bookId),
                   bookName: book_name,
                   authorName: author_name,
                   category: category,
-                  price: bookPrice,
                   coverImageName: coverImageName,
                   quantity: 1,
                   subtotal: bookPrice,
-                  stockCount: stockCount
+                  stockCount: stockCount,
+                  actualPrice: actualPrice,
+                  price: actualPrice,
+                  discountValue: discountValue
                 }
               }
             },
@@ -147,11 +175,13 @@ module.exports = {
             $pull: { items: { bookId: new ObjectId(bookId) } },
             $inc: {
               totalQuantity: -itemToRemove.quantity,
-              totalPrice: -itemToRemove.subtotal
+              totalPrice: -itemToRemove.subtotal,
+              totalDiscount: - itemToRemove.discountValue
             },
             $set: { updatedAt: new Date() }
           }
         );
+        await db.get().collection(collections.USER_CART_COLLECTION).deleteOne({ items: { $size: 0 } });
 
         resolve("Item removed from cart successfully");
       } catch (error) {
@@ -171,11 +201,15 @@ module.exports = {
           return reject("Book not found or has been deleted");
         }
   
-        let { price, stock } = bookDetails.bookDetails;
-        let bookPrice = parseFloat(price);
-
+        let { price, stock, discount = 0 } = bookDetails.bookDetails;
+        const actualPrice = parseFloat(price)
+        let discountValue = (actualPrice * discount /100);
+        let bookPrice = discount  ? actualPrice - discountValue : actualPrice;
+        console.log(actualPrice, discountValue, bookPrice);
+        
         if (count < 0) {
           bookPrice = -bookPrice;
+          discountValue = -discountValue
         }
   
         stock = Number(stock);
@@ -191,6 +225,7 @@ module.exports = {
           return reject("Cart or item not found");
         }
   
+
         const hasSufficientStock = cart.items.some((item) => {
           if (item.bookId.equals(new ObjectId(bookId))) {
 
@@ -225,8 +260,10 @@ module.exports = {
             $inc: { 
               "items.$.quantity": count, 
               "items.$.subtotal": bookPrice, 
+              "items.$.actualPrice": actualPrice, 
               totalQuantity: count, 
-              totalPrice: bookPrice 
+              totalPrice: bookPrice,
+              totalDiscount: discountValue
             },
             $set: { updatedAt: new Date() }
           }

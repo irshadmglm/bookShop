@@ -145,7 +145,7 @@
     
          
     <div class="menu-item">
-        <a href="http://localhost:3000/logout">
+        <a href="/logout">
             <i class="fas fa-sign-out-alt"></i>
             <span>Log out</span>
         </a>
@@ -161,7 +161,7 @@
         
         // Perform AJAX request
         $.ajax({
-            url: '/userbook/filter', 
+            url: '/user/userbooks/filter', 
             method: 'GET',
             data: {
                 categoryId: categoryId,
@@ -169,8 +169,9 @@
                 sort: sort
             },
             success: function(data) {
-    console.log(data);
     if (data.success) {
+        console.log(data.books);
+        
         // Build the HTML for books dynamically
         let booksHtml = '';
 
@@ -231,7 +232,7 @@
     $(document).on('click', '.book-card', function() {
         const bookId = $(this).data('id');
         if (bookId) {
-            window.location.href = `/userbook/view-book?bookId=${bookId}`;
+            window.location.href = `/user/userbooks/view-book?bookId=${bookId}`;
         }
     });
 </script>

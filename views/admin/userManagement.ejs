@@ -220,12 +220,12 @@
             
             <div>
                 <!-- Deleted Books Button -->
-                <button class="add-book-btn" onclick="window.location.href='/books/deleted-book'">
+                <button class="add-book-btn" onclick="window.location.href='/admin/books/deleted-book'">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             
                 <!-- Add Book Button -->
-                <button class="add-book-btn" onclick="window.location.href='/books/add-book'">
+                <button class="add-book-btn" onclick="window.location.href='/admin/books/add-book'">
                     <i class="fas fa-plus"></i> 
                 </button>
             </div>
@@ -287,7 +287,7 @@
             button.addEventListener('click', function() {
                 const userId = this.value;
                 if (userId) {
-                    window.location.href = `/user-management/edit-user?bookId=${userId}`;
+                    window.location.href = `/admin/user-management/edit-user?bookId=${userId}`;
                 }
             });
         });
@@ -296,7 +296,7 @@
             button.addEventListener('click', function() {
                 const userId = this.value;
                 if (userId) {
-                    window.location.href = `/user-management/user-status?userId=${userId}`;
+                    window.location.href = `/admin/user-management/user-status?userId=${userId}`;
                 }
             });
         });
@@ -305,7 +305,7 @@
             button.addEventListener('click', function() {
                 const userId = this.value;
                 if (userId) {
-                    window.location.href = `/user-management/view-user?bookId=${userId}`;
+                    window.location.href = `/admin/user-management/view-user?bookId=${userId}`;
                 }
             });
         });

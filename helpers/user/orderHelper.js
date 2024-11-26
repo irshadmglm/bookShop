@@ -6,17 +6,16 @@ const cartHelper = require('./cartHelper');
 const walletHelper = require('./walletHelper');
 
 module.exports = {
-    placeOrder: (userId, addressId, items, totalPrice, paymentMethod ) => {
+    placeOrder: (userId, addressId, items, totalPrice, paymentMethod, couponDeduction = 0 ) => {
         return new Promise(async (resolve, reject) => {
             try {
-                let totalAmount = 0;
+                let totalAmount = totalPrice;
+                couponDeduction = parseFloat(couponDeduction);
                 items.forEach(item => {
                     item.orderStatus = "Pending"; 
                     item.statusChangedAt = new Date(),
-                    item.totalPrice = item.price * item.quantity;  
-                    totalAmount += item.totalPrice;  
-
-                     db.get().collection(collections.BOOK_COLLECTION).updateOne(
+                    
+                    db.get().collection(collections.BOOK_COLLECTION).updateOne(
                         { _id: item.bookId },
                         { $inc: { "bookDetails.stock": -item.quantity } }
                     );
@@ -25,16 +24,18 @@ module.exports = {
                 
     
                 // Insert a new order for each checkout
-                await db.get().collection(collections.ORDER_COLLECTION).insertOne({
+               const order = await db.get().collection(collections.ORDER_COLLECTION).insertOne({
                     userId: new ObjectId(userId),
                     addressId: new ObjectId(addressId),
                     items: items,
                     totalAmount: totalAmount,
-                    paymentMethod: paymentMethod,
+                    paymentMethod: paymentMethod, 
+                    couponDeduction: couponDeduction,
                     createdAt: new Date().toISOString().split('T')[0],
                     updatedAt: new Date().toISOString().split('T')[0]
                 });
-    
+                console.log("orderrrrrrrrrr" , order);
+                
                 for (const item of items) {
                     try {
                         await cartHelper.removeFromCart(item.bookId,userId);
@@ -44,7 +45,7 @@ module.exports = {
                     }
                 }
     
-                resolve("Order completed successfully");
+                resolve({message:"Order completed successfully",orderId: order.insertedId});
             } catch (error) {
                 reject(error);
             }
@@ -69,7 +70,7 @@ module.exports = {
                     let items =item.bookDetails
     
                 // Insert a new order for each checkout
-                await db.get().collection(collections.ORDER_COLLECTION).insertOne({
+             const  order = await db.get().collection(collections.ORDER_COLLECTION).insertOne({
                     userId: new ObjectId(userId),
                     addressId: new ObjectId(addressId),
                     items: items,
@@ -105,15 +106,17 @@ module.exports = {
                     userId: new ObjectId(userId),
                     "items.bookId": new ObjectId(bookId)
                 })
+                let totalAmount;
+
                 order.items.forEach(item => {
-                      
+                       totalAmount = item.subtotal;
                      db.get().collection(collections.BOOK_COLLECTION).updateOne(
                         { _id: item.bookId },
                         { $inc: { "bookDetails.stock": item.quantity } }
                     );
                 });
                
-               await walletHelper.addToWallet(userId,order.totalAmount);
+               await walletHelper.addToWallet(userId,totalAmount);
 
 
 

@@ -505,7 +505,7 @@
     console.log(addressData);
     
     $.ajax({
-            url: '/order/direct-check-out', 
+            url: '/user/order/direct-check-out', 
             method: 'post',
             data: {
         addressId: addressId,
@@ -518,7 +518,7 @@
                 if (data.success) {
                     console.log(data);
                     alert('Order placed successfully!');
-                    window.location.href = `/user-cart`
+                    window.location.href = `/user/user-cart`
                   }
             },
             error: function(xhr, status, error) {

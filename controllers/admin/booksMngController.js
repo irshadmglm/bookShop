@@ -2,6 +2,7 @@ const bookHelper = require('../../helpers/admin/bookHelper');
 const multer = require('multer');
 const path = require('path');
 const { error } = require('console');
+const userBookHelper = require('../../helpers/user/userBookHelper');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, path.join(__dirname, '../../public/images/uploads'));
@@ -25,7 +26,7 @@ module.exports = {
         })
     },
 
-    getCategories: (req, res) => {
+    addbookForm: (req, res) => {
         bookHelper.getCategories().then((categories) => {
             res.render('admin/addBook', { categories: categories });
         })
@@ -48,10 +49,10 @@ module.exports = {
     
             bookHelper.addBook(req.body).then((response) => {
                 console.log(response);
-                res.redirect('/books');
+                res.redirect('/admin/books');
             }).catch((error) => {
                 console.log(error);
-                res.redirect('/books/add-book');
+                res.redirect('/admin/books/add-book');
             });
         });
     },
@@ -82,18 +83,18 @@ module.exports = {
             bookHelper.updateBook(req.body).then((response) => {
                 console.log(req.body);
     
-                res.redirect('/books')
+                res.redirect('/admin/books')
             }).catch((error) => {
-                res.redirect('/books')
+                res.redirect('/admin/books')
             })
         });
     },
 
     deleteBook: (req, res) => {
         bookHelper.deleteBook(req.query.bookId).then((response) => {
-            res.redirect('/books');
+            res.redirect('/admin/books');
         }).catch((error) => {
-            res.redirect('/books')
+            res.redirect('/admin/books')
         })
     },
 
@@ -105,10 +106,10 @@ module.exports = {
 
     recoverBook: (req, res) => {
         bookHelper.recoverBook(req.query.bookId).then((response) => {
-            res.redirect('/books/deleted-book');
+            res.redirect('/admin/books/deleted-book');
         }).catch((err) => {
             console.log(err);
-            res.redirect('/books/deleted-book');
+            res.redirect('/admin/books/deleted-book');
         })
     },
 
@@ -118,7 +119,7 @@ module.exports = {
             res.render('admin/viewBook', { book: book, categories: categories });
         }).catch((err) => {
             console.log(err);
-            res.redirect('/books');
+            res.redirect('/admin/books');
     
         })
     },
@@ -140,10 +141,10 @@ module.exports = {
 
     addCategory: (req, res) => {
         bookHelper.addCategory(req.body).then((response) => {
-            res.redirect('/books/categories');
+            res.redirect('/admin/books/categories');
         }).catch((error) => {
             console.log(error);
-            res.redirect('/books/add-category');
+            res.redirect('/admin/books/add-category');
     
         })
     },
@@ -159,16 +160,16 @@ module.exports = {
 
     editCategory: (req, res) => {
         bookHelper.editCategory(req.body).then((response) => {
-            res.redirect('/books/categories');
+            res.redirect('/admin/books/categories');
         }).catch((err) => {
             console.log(err);
-            res.redirect('/books/categories');
+            res.redirect('/admin/books/categories');
         })
     },
 
     deleteCaregory: (req, res) => {
         bookHelper.deleteCategory(req.query.categoryId).then(() => {
-            res.redirect('/books/categories');
+            res.redirect('/admin/books/categories');
         })
     },
 
@@ -182,7 +183,7 @@ module.exports = {
 
  recoverCategory: (req, res) => {
     bookHelper.recoverCategory(req.query.categoryId).then(() => {
-        res.redirect('/books/deleted-category')
+        res.redirect('/admin/books/deleted-category')
     })
 },
 
@@ -191,6 +192,39 @@ filter: (req, res) => {
         const [books, categories] = response;
         res.render('user/userHome', { books: books, categories: categories })
     })
+},
+bestSelling: async (req, res) => {
+    const { type } = req.query; 
+bookHelper.bestSelling(type).then((data)=>{
+    
+        const [books, categories, category] = data;
+        if(category){
+            console.log('category'+ category);
+            res.render('admin/categories', { categories: category });
+        }
+        
+        res.render('admin/books', { books: books, categories: categories });
+    }).catch((error) => {
+        console.log(error);
+    })
+},
+search: async (req, res) => {
+    try {
+        const query = req.query.q?.toLowerCase() || "";
+        if (!query) {
+            return res.status(400).json({ error: "Query parameter 'q' is required." });
+        }
+        const {books, categories}= await userBookHelper.search(query);
+        if (books.length > 0) {
+        res.render('admin/books', { books: books, categories: categories });
+        }else{
+            res.redirect('/admin/books')
+        }
+    } catch (error) {
+        console.error("Error in search controller:", error);
+        res.status(500).json({ success: false, error: "Internal Server Error" });
+}
+
 }
 
 }

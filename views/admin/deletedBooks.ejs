@@ -215,7 +215,7 @@
         categoryDropdown.addEventListener('change', function() {
             const selectedCategoryId = this.value;
             if (selectedCategoryId) {
-                window.location.href = `/books?categoryId=${selectedCategoryId}`;
+                window.location.href = `/admin/books?categoryId=${selectedCategoryId}`;
             }
         });
 
@@ -225,7 +225,7 @@
             button.addEventListener('click', function() {
                 const bookId = this.value;
                 if (bookId) {
-                    window.location.href = `/books/recover-book?bookId=${bookId}`;
+                    window.location.href = `/admin/books/recover-book?bookId=${bookId}`;
                 }
             });
         });

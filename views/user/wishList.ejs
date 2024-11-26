@@ -113,7 +113,7 @@
             button.addEventListener('click', (event) => {
                 const bookId = button.value;
                 const wishlistItem = button.closest('.wishlist-item');
-                fetch('/wish-list/remove-from-wishlist', {
+                fetch('/user/wish-list/remove-from-wishlist', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ bookId })

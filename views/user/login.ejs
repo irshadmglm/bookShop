@@ -140,7 +140,7 @@ a:hover {
         <div class="right-section">
             <h2>Login</h2>
                 <p><%= message %></p>
-            <form action="/login" method="post">
+            <form action="/user/login" method="post">
                 <div class="input-group">
                     <input type="email" placeholder="Email" name="email" required>
                 </div>
@@ -149,7 +149,7 @@ a:hover {
                 </div>
                 <input type="hidden" name="last_logedIn" id="last_logedIn" value="">
                 <button class="signup-btn">Login</button>
-                <a href="http://localhost:3000/forgot-password">Forgot Password?</a>
+                <a href="/user/forgot-password">Forgot Password?</a>
             </form>
             <div class="social-login">
                 <p>OR</p>
@@ -163,7 +163,7 @@ a:hover {
                     </a>
                 </div>
                 
-                <p>did you have't account? <a href="/signup">create new account</a></p>
+                <p>did you have't account? <a href="/user/signup">create new account</a></p>
             </div>
         </div>
     </div>

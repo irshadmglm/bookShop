@@ -98,7 +98,7 @@
         </div>
     
         <!-- Profile Edit Form -->
-        <form action="/edit-user" method="post">
+        <form action="/user/edit-user" method="post">
             <div class="form-field">
                 <input type="text" id="name" name="name" value="<%= user.name %>">
             </div>
@@ -111,7 +111,7 @@
                 <input type="text" id="phone" name="phone" value="<%= user.phone %>">
             </div>
     
-            <a href="/change-password" class="change-password">Change Password?</a>
+            <a href="/user/change-password" class="change-password">Change Password?</a>
     
             <div class="button-group">
                 <button type="button" class="button cancel-button">Cancel</button>

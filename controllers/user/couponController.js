@@ -12,9 +12,11 @@ module.exports = {
         const userId = req.session.user._id;
         couponHelper.couponValue(couponCode,userId).then((value)=>{
             console.log(value);
-            res.status(200).json({ discountAmount: value.discountAmount, newTotalPrice: value.newTotalPrice, success: true });
+            res.status(200).json({ couponDeduction: value.couponDeduction, newTotalPrice: value.newTotalPrice, success: true });
         }).catch((error)=>{
-            res.status(500).json({ message: error || 'An unexpected error occurred' });
+            console.log(error);
+            
+            res.status(500).json({ message: error.message || 'An unexpected error occurred' });
         })
     }
 }

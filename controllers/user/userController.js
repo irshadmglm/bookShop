@@ -6,10 +6,12 @@ const crypto = require('crypto');
 const userController = require('../../controllers/user/userController');
 require('../../middlewares/auth')
 const passport = require('passport');
+const cartHelper = require('../../helpers/user/cartHelper');
 
 
 module.exports = {
      signUp: (req, res) => {
+        req.body.isBlocked = false;
         req.session.temp = req.body;
         let otp = Math.floor(1000 + Math.random() * 9000);
         console.log(otp);
@@ -40,7 +42,7 @@ module.exports = {
                 if (response.status) {
                     req.session.user = response.user;
                     req.session.logedIn = true;
-                    res.redirect('/');
+                    res.redirect('/user');
                 }
             }).catch((error) => {
                 res.render('user/signUp', { message: error.message });
@@ -51,6 +53,8 @@ module.exports = {
     },
     resendOtp: (req, res) => {
         let otp = Math.floor(1000 + Math.random() * 9000);
+        console.log(otp);
+        
         req.session.otp = otp;
         userHelper.sendOtp(req.session.temp, otp).then(() => {
             res.render('user/otp', { message: "" });
@@ -62,11 +66,12 @@ module.exports = {
     },
     login: (req, res) => {
         userHelper.doLogin(req.body).then((response) => {
+            
             if (response.status) {
                 req.session.user = response.user;
                 req.session.logedIn = true;
             }
-            res.redirect('/');
+            res.redirect('/user');
         }).catch((error) => {
             res.render('user/login', { message: error.message })
         })
@@ -74,7 +79,7 @@ module.exports = {
 
     logOut: (req, res) => {
         req.session.destroy();
-        res.redirect('/');
+        res.redirect('/user');
     },
     googleAuth: passport.authenticate('google', {
         scope: ['profile', 'email'],
@@ -93,14 +98,14 @@ module.exports = {
             console.log('Authenticated user:', req.user);
                 req.session.user = req.user;
                 req.session.logedIn = true;
-                res.redirect('/');
+                res.redirect('/user');
           }
         }
       ],
     home: (req, res) => {
         bookHelper.getbooks().then((response) => {
             const [books, categories] = response;
-            const breadcrumbs = [{ name: 'Home', url: '/' }];
+            const breadcrumbs = [{ name: 'Home', url: '/user' }];
             res.render('user/userhome', { books: books, categories: categories, breadcrumbs: breadcrumbs })
     
         }).catch((err) => {
@@ -125,7 +130,7 @@ module.exports = {
             res.render('user/userinfo',{address:address,user:req.session.user})
         }).catch((err)=>{
             console.log(err);
-            res.redirect('/');
+            res.redirect('/user');
         })
     },
 
@@ -134,10 +139,10 @@ module.exports = {
             console.log(response);
             req.session.user = response;
             
-            res.redirect('/profile');
+            res.redirect('/user/profile');
         }).catch((err)=>{
             console.log(err);
-            res.redirect('/edit-user');
+            res.redirect('/user/edit-user');
             
         })
     },
@@ -148,10 +153,10 @@ module.exports = {
     
         userHelper.addAddress(body, userId)
         .then(()=>{
-            res.redirect('/profile');
+            res.redirect('/user/profile');
         }).catch((err)=>{
             console.log(err);
-            res.redirect('/add-address');
+            res.redirect('/user/add-address');
         })
     },
     getOneAddress: (req,res)=>{
@@ -160,20 +165,20 @@ module.exports = {
         res.render('user/editAddress',{address:address});
         }).catch((err)=>{
             console.log(err);
-            res.redirect('/profile');
+            res.redirect('/user/profile');
         })
     },
     editAddress: (req,res)=>{
         userHelper.editAddress(req.body).then(()=>{
-            res.redirect("/profile");
+            res.redirect("/user/profile");
         }).catch((err)=>{
             console.log(err);
-            res.redirect('/edit-address');
+            res.redirect('/user/edit-address');
         })
     },
     deleteAddress: (req,res)=>{
         userHelper.deleteAddress(req.query.addressId).then(()=>{
-            res.redirect('/profile');
+            res.redirect('/user/profile');
         })
     },
     forgetPassword: async(req,res)=>{
@@ -185,9 +190,9 @@ module.exports = {
         const token = crypto.randomBytes(32).toString('hex');
         const expiration = Date.now() + 3600000; 
         await userHelper.addPasswordResets(email,token,expiration);
-        const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+        const resetLink = `http://localhost:3000/user/reset-password?token=${token}`;
          userHelper.sendResetEmail(email, resetLink);
-         res.redirect('/');
+         res.redirect('/user');
     },
     getResetPassword: async(req,res)=>{
         const { token } = req.query;

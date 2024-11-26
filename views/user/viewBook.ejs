@@ -457,6 +457,19 @@
             opacity: 0;
             bottom: 10px;
         }
+        .price {
+        margin: 5px 0;
+    }
+    .price .current-price {
+        font-size: 16px;
+        font-weight: bold;
+        color: #4CAF50;
+    }
+    .price .original-price {
+        text-decoration: line-through;
+        margin-left: 10px;
+        color: gray;
+    }
     </style>
 
 
@@ -508,8 +521,21 @@
                         <h4>
                             <%= book.bookDetails.author_name || '' %>
                         </h4>
-                        <h3>₹<%= book.bookDetails.price || '' %>/-</h3>
-                        <h4 style="color: #28a745;">20% off</h4>
+
+                        <div class="price">
+                            <span class="current-price">
+                                ₹<%= book.bookDetails.discount ? (book.bookDetails.price - (book.bookDetails.price * book.bookDetails.discount / 100)).toFixed(2) : book.bookDetails.price %>
+                            </span>
+                            <% if(book.bookDetails.discount) { %>
+                            <span class="original-price">
+                                ₹<%= book.bookDetails.price || '' %>
+                            </span>
+                            <% } %>
+                        </div>
+
+                        <% if(book.bookDetails.discount) { %>
+                        <h4 style="color: #28a745;"><%= book.bookDetails.discount || '' %>% off</h4>
+                        <% } %>
                         <% if (book.bookDetails.stock> 0) { %>
                             <h3>
                                 <%= book.bookDetails.stock %> in stock
@@ -669,7 +695,7 @@
                         const bookId = this.getAttribute('data-book-id');
                         const review = document.getElementById('review').value;
 
-                        fetch(`/userbook/rating`, {
+                        fetch(`/user/userbooks/rating`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -770,29 +796,34 @@
                         const bookId = event.target.value;
                         const button = event.target;
 
-                        fetch('/user-cart/add-to-cart', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ bookId })
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    button.textContent = '✔ Added to Cart';
-                                    button.disabled = true;
+                fetch('/user/user-cart/add-to-cart', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bookId })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            button.textContent = '✔ Added to Cart';
+                            button.disabled = true;
 
-                                    showToast('Item added to cart successfully!');
+                            showToast('Item added to cart successfully!');
+                            // let cartCount = document.getElementById('cartcount');
+                            // cartCount.textContent = Number(cartCount.textContent) + 1;
+                            setTimeout(() => {
+                                button.textContent = 'Add to Cart';
+                                button.disabled = false;
+                            }, 2000); 
+                        } else {
+                           
+                            showToast(data.message || 'Failed to add item to cart.');
+                        }
+                    })
+                    .catch(err => {
+                        console.log('Fetch error:', err);
+                        showToast('Failed to add item to cart.');
+                    });
 
-                                    setTimeout(() => {
-                                        button.textContent = 'Add to Cart';
-                                        button.disabled = false;
-                                    }, 2000); 
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                showToast(error || 'Failed to add item to cart.');
-                            });
                     });
 
 
@@ -801,7 +832,7 @@
                         console.log(selectedbookId);
                         
                     if (selectedbookId) {
-                        window.location.href = `/order/direct-check-out?bookId=${selectedbookId}`;
+                        window.location.href = `/user/order/direct-check-out?bookId=${selectedbookId}`;
                     }
                     })
                     function showToast(message) {

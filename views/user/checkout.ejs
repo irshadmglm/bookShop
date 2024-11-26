@@ -292,6 +292,24 @@
 #checkout-form button[type="submit"]:hover {
     background-color: #f89a02;
 }
+.toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #ffce47;
+            /* Green background for success */
+            color: rgb(101, 63, 6);
+            padding: 10px 20px;
+            border-radius: 5px;
+            opacity: 1;
+            transition: opacity 0.5s ease, bottom 0.5s ease;
+            z-index: 1000;
+        }
+
+        .toast.hide {
+            opacity: 0;
+            bottom: 10px;
+        }
 
     </style>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -439,188 +457,176 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<script>
+    <script>
+        let addressData;
     
+        $(document).ready(function () {
+            // Show address form
+            $('.add-address-btn').on('click', function () {
+                $('.form-container').show();
+            });
     
+            // Hide address form
+            $('.cancel-button').on('click', function () {
+                $('.form-container').hide();
+            });
     
-    let addressData;
-
-    $(document).ready(function () {
-        $('.add-address-btn').on('click', function () {
-            $('.form-container').show();
-        });
-
-        $('.cancel-button').on('click', function () {
-            $('.form-container').hide();
-        });
-
-        $('#addressForm').on('submit', function (event) {
-            event.preventDefault();
-
-            const formData = new FormData(event.target);
-            addressData = {
-                house_number: formData.get('house_number'),
-                street_address: formData.get('street_address'),
-                city: formData.get('city'),
-                district: formData.get('district'),
-                state: formData.get('state'),
-                pincode: formData.get('pincode'),
-                phone: formData.get('phone'),
-                email: formData.get('email')
-            };
-
-            addAddressToDOM(addressData);
-            $('.form-container').hide();
-            event.target.reset();
-        });
-
-        function addAddressToDOM(data) {
-            const addressList = $('#addressList');
-            const addressDiv = $(`
-                <div class="info-container">
-                    <div class="info-group">
-                        <div class="info-item address-line"><i class="fas fa-home"></i> ${data.house_number}, ${data.street_address}</div>
-                        <div class="info-item address-line"><i class="fas fa-map-marker-alt"></i> ${data.city}, ${data.district}, ${data.state} - ${data.pincode}</div>
-                        <div class="info-item contact"><i class="fas fa-phone"></i> ${data.phone}</div>
-                        <div class="info-item contact"><i class="fas fa-envelope"></i> ${data.email}</div>
+            // Submit address form
+            $('#addressForm').on('submit', function (event) {
+                event.preventDefault();
+    
+                const formData = new FormData(event.target);
+                addressData = {
+                    house_number: formData.get('house_number'),
+                    street_address: formData.get('street_address'),
+                    city: formData.get('city'),
+                    district: formData.get('district'),
+                    state: formData.get('state'),
+                    pincode: formData.get('pincode'),
+                    phone: formData.get('phone'),
+                    email: formData.get('email')
+                };
+    
+                addAddressToDOM(addressData);
+                $('.form-container').hide();
+                event.target.reset();
+            });
+    
+            // Add address to the DOM
+            function addAddressToDOM(data) {
+                const addressList = $('#addressList');
+                const addressDiv = $(`
+                    <div class="info-container">
+                        <div class="info-group">
+                            <div class="info-item address-line"><i class="fas fa-home"></i> ${data.house_number}, ${data.street_address}</div>
+                            <div class="info-item address-line"><i class="fas fa-map-marker-alt"></i> ${data.city}, ${data.district}, ${data.state} - ${data.pincode}</div>
+                            <div class="info-item contact"><i class="fas fa-phone"></i> ${data.phone}</div>
+                            <div class="info-item contact"><i class="fas fa-envelope"></i> ${data.email}</div>
+                        </div>
+                        <input type="radio" name="address" value="${data._id}" required>
                     </div>
-                    <input type="radio" name="address" value="${data._id}" required>
-                </div>
-            `);
-            addressList.append(addressDiv);
-        }
-
-        $('.place-order-btn').on('click', async function () {
-            const selectedAddress = $('input[name="address"]:checked');
-            const selectedPaymentMethod = $('input[name="paymentMethod"]:checked');
-
-            if (!selectedAddress.length) {
-                alert("Please select a delivery address before placing an order.");
-                return;
+                `);
+                addressList.append(addressDiv);
             }
-            if (!selectedPaymentMethod.length) {
-                alert("Please select a payment method before placing an order.");
-                return;
-            }
-
-            const addressId = selectedAddress.val();
-            const paymentMethod = selectedPaymentMethod.val();
-
-            alert(`Order will be placed for address ID: ${addressId}`);
-            console.log(addressData);
-
-            const checkoutSuccess = await new Promise((resolve, reject) => {
-                $.ajax({
-                    url: '/order/check-out',
-                    method: 'post',
-                    data: {
+    
+            // Place order logic
+            $('.place-order-btn').on('click', async function () {
+                const selectedAddress = $('input[name="address"]:checked');
+                const selectedPaymentMethod = $('input[name="paymentMethod"]:checked');
+    
+                if (!selectedAddress.length) {
+                    showToast("Please select a delivery address before placing an order.");
+                    return;
+                }
+                if (!selectedPaymentMethod.length) {
+                    showToast("Please select a payment method before placing an order.");
+                    return;
+                }
+    
+                const addressId = selectedAddress.val();
+                const paymentMethod = selectedPaymentMethod.val();
+                const amount = parseFloat($('#totoalprice').text());
+    
+                if (paymentMethod === 'cod' && amount > 1000) {
+                    showToast("Orders above Rs 1000 are not allowed for Cash on Delivery. Please choose another payment method.");
+                    return;
+                }
+    
+                try {
+                    // Checkout API call
+                    const checkoutResponse = await $.post('/user/order/check-out', {
                         addressId: addressId,
                         addressData: addressData,
                         paymentMethod: paymentMethod
-                    },
-                    success: function (data) {
-                        if (data.success) {
-                            alert('Order placed successfully!');
-                            resolve(true);
-                        } else {
-                            reject('Checkout failed');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('AJAX error:', error);
-                        alert('Error placing order. Please try again.');
-                        reject(error);
+                    });
+    
+                    if (!checkoutResponse.success) {
+                        showToast("Checkout failed. Please try again.");
+                        return;
                     }
-                });
-            });
-
-            if (!checkoutSuccess) return;
-            if (paymentMethod != "online") return;
-
-            const amount = parseFloat($('#totoalprice').text());
-
-            try {
-                const orderData = await fetch('/payments/razorpay/create-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amount })
-                }).then(res => res.json());
-
-                console.log(orderData);
-
-                const options = {
-    key: "rzp_test_m4uStv1HcH5oR4",
-    amount: orderData.order.amount,
-    currency: "INR",
-    name: "Your Company Name",
-    description: "Order Payment",
-    order_id: orderData.order.id,
-    handler: function (response) {
-        alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
-
-        // Save payment details in database
-        $.ajax({
-            url: '/payments/save-payment',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                transactionId: response.razorpay_payment_id,
-                orderId: response.razorpay_order_id,
-                amount: orderData.order.amount,
-                status: 'completed',
-                paymentMethod: 'Razorpay',
-                addressData: addressData,
-                addressId: addressId,
-                userId: 'USER_ID' 
-            }),
-            success: function (data) {
-                if (data.success) {
-                    alert('Payment details saved successfully!');
-                } else {
-                    alert('Failed to save payment details.');
+    
+                    if (paymentMethod !== "online") {
+                        showToast("Order placed successfully!");
+                        setTimeout(() => {
+                            window.location.href = window.location.href = '/user/order/order-success'; 
+                        }, 2000);
+                        return;
+                    }
+    
+                    // Create Razorpay order
+                    const orderData = await fetch('/user/payments/razorpay/create-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            amount
+                        })
+                    }).then(res => res.json());
+    
+                    // Razorpay options
+                    const options = {
+                        key: "rzp_test_m4uStv1HcH5oR4",
+                        amount: orderData.order.amount,
+                        currency: "INR",
+                        name: "Your Company Name",
+                        description: "Order Payment",
+                        order_id: orderData.order.id,
+                        handler: async function (response) {       
+                            const verificationResponse = await fetch('/user/payments/razorpay/verify-payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_signature: response.razorpay_signature,
+                                    orderId: checkoutResponse.orderId,
+                                    items: checkoutResponse.items
+                                })
+                            }).then(res => res.json());
+    
+                            if (verificationResponse.success) {
+                                showToast("Payment successful and verified!");
+                                setTimeout(() => {
+                            window.location.href = window.location.href = '/user/order/order-success'; 
+                                 }, 2000);
+                                savePaymentDetails(response, 'completed');
+                            } else {
+                                showToast("Payment verification failed. Please contact support.");
+                            }
+                        },
+                        modal: {
+                            ondismiss: function () {
+                                showToast("Payment cancelled. You can retry from 'My Orders'.");
+                            }
+                        },
+                        prefill: {
+                            name: "User Name",
+                            email: "user@example.com",
+                            contact: "9999999999"
+                        },
+                        theme: { color: "#ffb400" }
+                    };
+    
+                    const rzp = new Razorpay(options);
+                    rzp.open();
+    
+                } catch (error) {
+                    console.error("Error during order placement:", error);
+                    showToast("An error occurred. Please try again.");
                 }
-            },
-            error: function (xhr, status, error) {
-                console.error('Error saving payment details:', error);
-                alert('Failed to save payment details. Please contact support.');
+            });
+    
+            // Show toast messages
+            function showToast(message) {
+                const toast = $('<div class="toast"></div>').text(message);
+                $('body').append(toast);
+                setTimeout(() => {
+                    toast.addClass('hide');
+                    setTimeout(() => toast.remove(), 500);
+                }, 2000);
             }
         });
-    },
-    prefill: {
-        name: "User Name",
-        email: "user@example.com",
-        contact: "9999999999"
-    },
-    theme: { color: "#ffb400" }
-};
-
-const rzp = new Razorpay(options);
-rzp.open();
-
-            } catch (error) {
-                console.error("Error creating order:", error);
-                alert("Failed to initiate payment. Please try again.");
-            }
-        });
-
-        $('.edit').on('click', function () {
-            const data = JSON.parse($(this).attr("data-address"));
-            if (data) {
-                $('.form-container').show();
-                $('input[name="address_id"]').val(data._id);
-                $('input[name="house_number"]').val(data.address.house_number);
-                $('input[name="street_address"]').val(data.address.street_address);
-                $('input[name="city"]').val(data.address.city);
-                $('input[name="district"]').val(data.address.district);
-                $('input[name="state"]').val(data.address.state);
-                $('input[name="pincode"]').val(data.address.pincode);
-                $('input[name="phone"]').val(data.address.phone);
-                $('input[name="email"]').val(data.address.email);
-            }
-        });
-    });
-</script>
-
+    </script>
+    
     
 </body>
 

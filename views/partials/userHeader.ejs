@@ -166,6 +166,38 @@
         .content {
             padding: 20px;
         }
+        .cart-link {
+    text-decoration: none;
+    color: #333;
+    font-size: 1rem;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-right: 25px;
+}
+
+.cartcount {
+    background-color: #ff5a5f;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: -10px;
+    right: -15px;
+    
+}
+
+.cart-link i {
+    font-size: 1.2rem;
+    margin-left: 8px;
+}
+
     </style>
 </head>
 <body>
@@ -174,24 +206,28 @@
 <div class="header">
     <div class="logo">Book Shop</div>
     <div class="search-bar">
-        <input type="text" placeholder="Search Book">
-        <button type="button">Search</button>
+        <input type="text" id="search-input"  placeholder="Search Book">
+        <button type="button" id="search-button">Search</button>
     </div>
     <div class="icon">
         <% if (session.user) { %>
-            <a href="/user-cart"><i class="fas fa-shopping-cart"></i></a>
+            <a href="/user/user-cart" class="cart-link" title="View Cart">
+                    <span class="cartcount" id="cartcount"><%= cartCount %></span>
+                <i class="fas fa-shopping-cart"></i>
+            </a>
+            
             <div class="dropdown">
                 <button class="user-btn">
                     <i class="fas fa-user"></i> <%= session.user.name %>
                 </button>
                 <div class="dropdown-content">
-                    <a href="/profile"><i class="fas fa-user"></i> Profile</a>
-                    <a href="/user-cart"><i class="fas fa-shopping-cart"></i> Cart</a>
-                    <a href="/order"><i class="fas fa-history"></i> Orders</a>
-                    <a href="/coupons"><i class="fas fa-ticket-alt"></i> Coupons</a>
-                    <a href="/wallet"><i class="fas fa-wallet"></i> Wallet</a>
-                    <a href="/wish-list"><i class="fas fa-heart"></i> Wish List</a>
-                    <a href="/logout"><i class="fas fa-sign-out-alt"></i> Log Out</a> 
+                    <a href="/user/profile"><i class="fas fa-user"></i> Profile</a>
+                    <a href="/user/user-cart"><i class="fas fa-shopping-cart"></i> Cart</a>
+                    <a href="/user/order"><i class="fas fa-history"></i> Orders</a>
+                    <a href="/user/coupons"><i class="fas fa-ticket-alt"></i> Coupons</a>
+                    <a href="/user/wallet"><i class="fas fa-wallet"></i> Wallet</a>
+                    <a href="/user/wish-list"><i class="fas fa-heart"></i> Wish List</a>
+                    <a href="/user/logout"><i class="fas fa-sign-out-alt"></i> Log Out</a> 
                 </div>
                 
             </div>
@@ -210,7 +246,7 @@
 </div>
 
 <div class="nav">
-    <a href="/" class="active">Home</a>
+    <a href="/user" class="active">Home</a>
     <a href="#">New Releases</a>
     <a href="#">Offer</a>
     <a href="#">Best Sellers</a>
@@ -219,5 +255,72 @@
 
 <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 
+<script>
+    document.getElementById("search-button").addEventListener("click", () => {
+    const query = document.getElementById("search-input").value.trim();
+
+    if (query) {
+        fetch(`/user/userbooks/search?q=${query}`)
+            .then((response) => response.json())
+            .then((data) => {
+                displayResults(data.books);
+            })
+            .catch((error) => console.error("Error fetching books:", error));
+    } else {
+        alert("Please enter a search term.");
+    }
+});
+
+function displayResults(books) {
+    const resultsContainer = document.getElementById("books");
+    resultsContainer.innerHTML = ""; 
+
+    if (books.length === 0) {
+        resultsContainer.innerHTML = "<p>No books found.</p>";
+        return;
+    }
+
+    let booksHtml = "";
+
+    books.forEach(function(book) {
+        booksHtml += `
+            <div class="book-card" data-id="${book._id}">
+                <!-- Wishlist Button -->
+                <button class="wishlist-btn" data-id="${book._id}" title="Add to wishlist">
+                    <i class="far fa-heart"></i>
+                </button>
+                <!-- Book Cover Image -->
+                <img src="images/uploads/${book.bookDetails.coverImageName}" alt="Book Cover">
+                <!-- Book Title -->
+                <div class="book-title">${book.bookDetails.book_name || "Unknown Title"}</div>
+                <!-- Book Author -->
+                <div class="book-author">${book.bookDetails.author_name || "Unknown Author"}</div>
+                <!-- Book Rating -->
+                <div class="rating">${book.average_rating ? book.average_rating + "★" : "No Rating"}</div>
+                <!-- Price Section -->
+                <div class="price">
+                    <span class="current-price">
+                        ₹${book.bookDetails.discount 
+                            ? (book.bookDetails.price - (book.bookDetails.price * book.bookDetails.discount / 100)).toFixed(2) 
+                            : book.bookDetails.price}
+                    </span>
+                    <span class="original-price">
+                        ₹${book.bookDetails.price || ""}
+                    </span>
+                </div>
+                <!-- Discount Section (if available) -->
+                ${book.bookDetails.discount ? `<div class="discount">${book.bookDetails.discount}% off</div>` : ""}
+                <!-- Free Delivery Text -->
+                <div class="free-delivery">Free Delivery</div>
+                <hr class="separator-line">
+            </div>
+        `;
+    });
+
+    resultsContainer.innerHTML = booksHtml;
+}
+
+
+</script>
 </body>
 </html>

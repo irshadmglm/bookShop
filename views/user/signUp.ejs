@@ -135,7 +135,7 @@ a {
         <div class="right-section">
             <h2>create new account</h2>
             <p><%= message %></p>
-            <form action="/signup" method="post">
+            <form action="/user/signup" method="post">
                 <div class="input-group">
                     <input type="text" placeholder="Name" name="name" required>
                 </div>
@@ -163,12 +163,12 @@ a {
                         <i class="fab fa-facebook"></i>
                     </a>
                 </div>
-                <p>Returning user? <a href="/">Log in here</a></p>
+                <p>Returning user? <a href="/user">Log in here</a></p>
             </div>
         </div>
     </div>
     <script>
-        document.getElementById('status').value = false;
+        // document.getElementById('status').value = false;
         let timeStamp = new Date().toISOString();
         document.addEventListener("DOMContentLoaded",()=>{
             document.getElementById('joined_date').value = timeStamp;

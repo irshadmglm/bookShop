@@ -15,12 +15,12 @@ passport.use(new GoogleStrategy({
     scope: ['profile', 'email'],
     prompt: 'select_account'
   },
-  async function(request, accessToken, refreshToken, profile, done) {  // Use "done" instead of "cb"
+  async function(request, accessToken, refreshToken, profile, done) { 
     try {
-      console.log("Google Profile:", profile); // Log the profile for debugging
+      console.log("Google Profile:", profile); 
       
       if (!profile || !profile.id) {
-        return done(new Error("Invalid Google profile data")); // Added more robust error handling
+        return done(new Error("Invalid Google profile data")); 
       }
 
       
@@ -29,14 +29,14 @@ passport.use(new GoogleStrategy({
       
       if (user) {
         console.log("Existing user found:", user);
-        return done(null, user);  // Return existing user
+        return done(null, user);
       } else {
         // Create a new user
         let newUser = {
           googleId: profile.id,
           name: profile.displayName,
           email: profile.emails[0].value,
-          password: await bcrypt.hash(profile.id, 10),  // Optional: Consider not storing a password for OAuth users
+          password: await bcrypt.hash(profile.id, 10),  
           joined_date: new Date().toISOString(),
           last_logedIn: new Date().toISOString()
         };

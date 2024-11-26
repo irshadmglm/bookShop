@@ -127,7 +127,7 @@
                 </button>
             </div>
 
-            <button class="add-coupon-btn" onclick="window.location.href='/coupon-management/add-coupon'">
+            <button class="add-coupon-btn" onclick="window.location.href='/admin/coupon-management/add-coupon'">
                 <i class="fas fa-plus"></i> Add Coupon
             </button>
         </div>
@@ -180,7 +180,7 @@
             button.addEventListener('click', function () {
                 const couponId = this.value;
                 if (couponId) {
-                    window.location.href = `/coupons/edit-coupon?couponId=${couponId}`;
+                    window.location.href = `/admin/coupons/edit-coupon?couponId=${couponId}`;
                 }
             });
         });
@@ -189,7 +189,7 @@
             button.addEventListener('click', function () {
                 const couponId = this.value;
                 if (couponId) {
-                    window.location.href = `/coupons/delete-coupon?couponId=${couponId}`;
+                    window.location.href = `/admin/coupons/delete-coupon?couponId=${couponId}`;
                 }
             });
         });

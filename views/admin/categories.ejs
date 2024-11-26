@@ -182,6 +182,23 @@
             font-size: 14px;
             color: #777;
         }
+        .sort-button {
+    padding: 10px 20px;
+    font-size: 14px;
+    height: 40px;
+    width: 200px;
+    color: #492006;
+    background-color: #f7dcb6;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.sort-button:hover {
+    background-color: #fff5a7;
+    color: #5b2a0a;
+}
     </style>
 </head>
 
@@ -190,42 +207,19 @@
     <!-- Main Content Container -->
     <div class="container">
         <div class="header">
-            <div class="sort">
-                <label for="category" class="sort-label">Sort by category:</label>
-                <select id="category" name="categoryId" class="sort-select">
-                    <option value="">Select</option>
-                    <option value="0">All</option>
-                    <option value="1">Fiction</option>
-                    <option value="2">Non-Fiction</option>
-                    <option value="3">Science</option>
-                    <option value="4">Biography</option>
-                    <option value="5">History</option>
-                    <option value="6">Self-help</option>
-                    <option value="7">Mystery</option>
-                    <option value="8">Romance</option>
-                    <option value="9">Fantasy</option>
-                    <option value="10">Thriller</option>
-                </select>
-            </div>
+            
             
 
-            <!-- Search and Add Book Button -->
-            <div class="search">
-                <input type="text" placeholder="Search...">
-                <button class="search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
-                
-            </div>
+            <button id="best-selling" class="sort-button">Best Selling Categories</button>
             
             <div>
                 <!-- Deleted Books Button -->
-                <button class="add-book-btn" onclick="window.location.href='/books/deleted-category'">
+                <button class="add-book-btn" onclick="window.location.href='/admin/books/deleted-category'">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             
                 <!-- Add Book Button -->
-                <button class="add-book-btn" onclick="window.location.href='/books/add-category'">
+                <button class="add-book-btn" onclick="window.location.href='/admin/books/add-category'">
                     <i class="fas fa-plus"></i> 
                 </button>
             </div>
@@ -276,7 +270,7 @@
             button.addEventListener('click', function() {
                 const categoryId = this.value;
                 if (categoryId) {
-                    window.location.href = `/books/edit-category?categoryId=${categoryId}`;
+                    window.location.href = `/admin/books/edit-category?categoryId=${categoryId}`;
                 }
             });
         });
@@ -287,10 +281,14 @@
             button.addEventListener('click', function() {
                 const categoryId = this.value;
                 if (categoryId) {
-                    window.location.href = `/books/delete-category?categoryId=${categoryId}`;
+                    window.location.href = `/admin/books/delete-category?categoryId=${categoryId}`;
                 }
             });
         });
+
+        document.getElementById('best-selling').addEventListener('click', function () {
+          window.location.href = '/admin/books/best-selling?type=categories';
+            });
     </script>
 
     <script>

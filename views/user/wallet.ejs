@@ -139,6 +139,7 @@
     <%- include('../partials/usersSidebar') %>
   <div class="wallet-container">
     <h2>Book Shop Wallet</h2>
+    <% if( wallet){ %>
     
     <div class="balance-section">
       <div class="total-balance">
@@ -167,10 +168,20 @@
         </tr>
           <% }) %>
          
+       
         
     
       </tbody>
     </table>
+   
   </div>
+   <% } else { %>
+      <!-- Empty cart message -->
+      <div class="empty-message">
+          <h2> <i class="fas fa-wallet"></i></h2>
+          <h4> Your Wallet is currently empty.</h4>
+      </div>
+      
+  <% } %>
 </body>
 </html>

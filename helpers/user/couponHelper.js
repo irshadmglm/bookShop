@@ -20,24 +20,31 @@ module.exports = {
       try {
         let cart = await getUserCart(userId)
         let price = cart.totalPrice;
-        let discountAmount = 0
+        let couponDeduction = 0
         let newTotalPrice = price;
         let coupon = await db.get().collection(collections.COUPON_COLLECTION).findOne({coupon_code: couponCode});
-        if (!coupon) {
+        if (!coupon ) {
             return resolve(price); 
         }
-         
+        if (price < coupon.min_purchase) {
+            throw new Error("Price does not meet the minimum purchase requirement.");
+        }
+        
         if(coupon.discount_type === 'percentage'){
-            discountAmount = coupon.discount_value / 100 * price
-            newTotalPrice = price - discountAmount;
+            couponDeduction = coupon.discount_value / 100 * price
+            newTotalPrice = price - couponDeduction;
         }else if(coupon.discount_type === 'fixed_amount'){
-            discountAmount = price - coupon.discount_value;
-            newTotalPrice = price - discountAmount;
+            newTotalPrice = price - coupon.discount_value;
+            couponDeduction = coupon.discount_value;
         }else{
             newTotalPrice = price;
-            discountAmount = 0;
+            couponDeduction = 0;
         }
-        resolve({discountAmount,newTotalPrice});
+        couponDeduction = parseFloat(couponDeduction);
+        console.log("couponDeduction", couponDeduction);
+        
+       await db.get().collection(collections.USER_CART_COLLECTION).updateOne({userId: new ObjectId(userId)}, {$set:{couponDeduction: couponDeduction}})
+        resolve({couponDeduction,newTotalPrice});
       } catch (error) {
         reject(error);
       }

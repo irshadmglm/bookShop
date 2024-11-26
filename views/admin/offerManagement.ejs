@@ -131,7 +131,7 @@
                 <input type="text" placeholder="Search offers...">
                 <button class="search-btn">Search</button>
             </div>
-            <button class="add-offer-btn" onclick="window.location.href='/offer-management/add-offer'">Add Offer</button>
+            <button class="add-offer-btn" onclick="window.location.href='/admin/offer-management/add-offer'">Add Offer</button>
         </div>
 
         <table class="offers-table">
@@ -155,9 +155,9 @@
                         <td><%= data.details.status %></td>
                         <td>
                             <div class="action-btns">
-                                <button class="icon-btn" title="View" onclick="window.location.href='/offers/view/<%= data._id %>'"><i class="fas fa-eye"></i></button>
-                                <button class="icon-btn" title="Edit" onclick="window.location.href='/offers/edit/<%= data._id %>'"><i class="fas fa-edit"></i></button>
-                                <button class="icon-btn" title="Delete" onclick="window.location.href='/offers/delete/<%= data._id %>'"><i class="fas fa-trash-alt"></i></button>
+                                <button class="icon-btn" title="View" onclick="window.location.href='/admin/offers/view/<%= data._id %>'"><i class="fas fa-eye"></i></button>
+                                <button class="icon-btn" title="Edit" onclick="window.location.href='/admin/offers/edit/<%= data._id %>'"><i class="fas fa-edit"></i></button>
+                                <button class="icon-btn" title="Delete" onclick="window.location.href='/admin/offers/delete/<%= data._id %>'"><i class="fas fa-trash-alt"></i></button>
                             </div>
                         </td>
                     </tr>

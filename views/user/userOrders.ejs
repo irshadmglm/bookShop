@@ -318,7 +318,7 @@
 
         button {
             padding: 10px 20px;
-            background-color: #0056b3;
+            background-color: #e0d6b0;
             color: white;
             border: none;
             border-radius: 5px;
@@ -402,10 +402,15 @@
                                             </div>
                                             <div class="status">
                                                 <% if( item.orderStatus=='Pending' ){%>
-                                                    <p style="color: rgb(6, 145, 34); font-weight: bold;" class="stock">
-                                                        Order Confirmed
+                                                    <p style="color: rgb(201, 145, 6); font-weight: bold;" class="stock">
+                                                         Pending
                                                     </p>
                                                     <% }else if( item.orderStatus=='Delivered' ){ %>
+                                                        <p style="color: rgb(0, 153, 10);" class="stock">
+                                                            <%= item.orderStatus || ' ' %> on <%=
+                                                                    item.statusChangedAt.toDateString() || ' ' %>
+                                                        </p>
+                                                    <% }else if( item.orderStatus=='Conformed' ){ %>
                                                         <p style="color: rgb(0, 153, 10);" class="stock">
                                                             <%= item.orderStatus || ' ' %> on <%=
                                                                     item.statusChangedAt.toDateString() || ' ' %>
@@ -428,7 +433,7 @@
                                                                 </p>
                                                                 <% } %>
                                                         <!-- Remove Button and Quantity Controls -->
-                                                   <% if( item.orderStatus=='Pending' ||
+                                                   <% if( item.orderStatus=='Conformed' ||
                                                        item.orderStatus=='Shipped' ){ %>
                                                        <div class="controls">
                                                        <button
@@ -441,31 +446,36 @@
                                                   class="return-link" id="<%= item.bookId %>,<%= order._id%>"
                                             onclick="openReturnModal()">Return Item</a>
                                                   <% } %>
+                                                    <% if (item.orderStatus=='Pending' ) { %>
+
+                                                        <div class="controls">
+                                                            <button class="payment-continue"
+                                                         value="<%= item.bookId %>,<%= order._id%>,<%= item.subtotal %>"
+                                                                class=" ">Payment Continue</button>
+                                                           </div>
+                                                  <% } %>
                                             </div>
                                         </div>
 
-                                        <!-- Modal Pop-up for Return Reason -->
-                        <div id="returnModal" class="modal">
-                            <div class="modal-content">
-                                <h2>Why are you returning this book?</h2>
-                              
-                                    <label for="returnReason">Choose a reason:</label>
-                                    <select id="returnReason" >
-                                        <option value="Damaged">Damaged</option>
-                                        <option value="Wrong Item">Wrong Item</option>
-                                        <option value="Better Price Available">Better Price Available</option>
-                                        <option value="No Longer Needed">No Longer Needed</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                  <div class="button-group">
-                                    <button type="button" id="return-order" class="button save-button return-order" value="<%= item.bookId %>,<%= order._id%>">Submit Return</button>
-                                    <button type="button" onclick="closeReturnModal()" class="button cancel-button">No, Keep Order</button>
+                                                            <!-- Modal Pop-up for Return Reason -->
+                                        <div id="returnModal" class="modal" role="dialog" aria-labelledby="returnModalLabel" aria-hidden="true">
+                                            <div class="modal-content" role="document">
+                                                <h2 id="returnModalLabel">Why are you returning this book?</h2>
+                                                <label for="returnReason">Choose a reason:</label>
+                                                <select id="returnReason">
+                                                    <option value="Damaged">Damaged</option>
+                                                    <option value="Wrong Item">Wrong Item</option>
+                                                    <option value="Better Price Available">Better Price Available</option>
+                                                    <option value="No Longer Needed">No Longer Needed</option>
+                                                    <option value="Other">Other</option>
+                                                </select>
+                                                <div class="button-group">
+                                                    <button type="button" id="return-order" class="button save-button return-order" value="<%= item.bookId %>,<%= order._id%>">Submit Return</button>
+                                                    <button type="button" onclick="closeReturnModal()" class="button cancel-button">No, Keep Order</button>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                
-                                  </div>
-                                
-                            </div>
-                        </div>
 
 
                                         <% }) %>
@@ -484,6 +494,8 @@
                             </div>
 
                             <% } %>
+                            
+                               <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
                                 <script>
                                     document.querySelectorAll('.remove-btn').forEach((button) => {
@@ -496,7 +508,7 @@
                                                 const cartItem = button.closest('.cart-item-container');
 
                                                 try {
-                                                    const response = await fetch('/order/cancel-from-order', {
+                                                    const response = await fetch('/user/order/cancel-from-order', {
                                                         method: 'POST',
                                                         headers: { 'Content-Type': 'application/json' },
                                                         body: JSON.stringify({ bookId, orderId })
@@ -533,7 +545,7 @@
                                                 const [bookId, orderId] = ids.split(',')
                                                 const selectedReason = document.getElementById("returnReason").value;
                                                 try {
-                                                    const response = await fetch('/order/return-order', {
+                                                    const response = await fetch('/user/order/return-order', {
                                                         method: 'POST',
                                                         headers: { 'Content-Type': 'application/json' },
                                                         body: JSON.stringify({ bookId, orderId })
@@ -562,52 +574,7 @@
                                         });
                                    })
                                         
-                                   
-
-
-                                    document.querySelectorAll('.quantity').forEach((button) => {
-                                        button.addEventListener('click', () => {
-                                            const arr = button.value.split(',')
-                                            const quantityDisplay = event.target.closest('.controls').querySelector('.quantity-display');
-                                            const cartItem = button.closest('.cart-item-container');
-                                            const quantityString = quantityDisplay.textContent;
-                                            const quantity = Number(quantityString);
-                                            const bookId = arr[0];
-                                            const count = Number(arr[1]);
-                                            fetch('/user-cart/change-quantity', {
-                                                method: 'POST',
-                                                headers: { 'Content-Type': 'application/json' },
-                                                body: JSON.stringify({ bookId, count })
-                                            })
-                                                .then(response => {
-                                                    if (!response.ok) {
-                                                        return response.json().then(error => { throw new Error(error.message); });
-                                                    }
-                                                    return response.json();
-                                                })
-                                                .then(data => {
-                                                    if (data.success) {
-                                                        quantityDisplay.textContent = quantity + count;
-                                                        if (data.message == "Item removed from cart successfully") {
-                                                            cartItem.style.transition = "opacity 0.5s ease";
-                                                            cartItem.style.opacity = 0;
-                                                            setTimeout(() => {
-                                                                cartItem.remove();
-
-                                                            }, 500);
-                                                        }
-                                                        showToast(data.message);
-                                                    }
-                                                })
-                                                .catch(error => {
-                                                    console.error('Error:', error);
-                                                    showToast(error.message || 'An error occurred');
-                                                });
-
-                                        })
-                                    })
-
-                                    function showToast(message) {
+                                   function showToast(message) {
                                         const toast = document.createElement('div');
                                         toast.className = 'toast';
                                         toast.textContent = message;
@@ -618,16 +585,131 @@
                                         }, 2000);
                                     }
 
-                             function updateCartCount(quantity) {
-                                const cartCountElement = document.querySelector('.cart-count');
-                                const currentCount = Number(cartCountElement.textContent) || 0;
-                                const updatedCount = currentCount - quantity;
-                               cartCountElement.textContent = updatedCount >= 0 ? updatedCount : 0;
-                               }
 
-                            document.getElementById('order-button').addEventListener('click', () => {
-                             window.location.href = `/order/check-out`;
-                            })
+                    document.querySelectorAll('.payment-continue').forEach((button)=>{
+                        button.addEventListener('click',async()=>{
+                            const arr = button.value.split(',');
+                            const bookId = arr[0];
+                            const orderId = arr[1];
+                            const amount = parseFloat(arr[2]);
+
+                            
+                    try {
+                      // Create Razorpay order
+                    const orderData = await fetch('/user/payments/razorpay/create-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            amount
+                        })
+                    }).then(res => res.json());
+    
+                    // Razorpay options
+                    const options = {
+                        key: "rzp_test_m4uStv1HcH5oR4",
+                        amount: orderData.order.amount,
+                        currency: "INR",
+                        name: "Your Company Name",
+                        description: "Order Payment",
+                        order_id: orderData.order.id,
+                        handler: async function (response) {       
+                            const verificationResponse = await fetch('/user/payments/razorpay/verify-payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_signature: response.razorpay_signature,
+                                    orderId: orderId,
+                                    bookId: bookId
+                                })
+                            }).then(res => res.json());
+    
+                            if (verificationResponse.success) {
+                                showToast("Payment successful and verified!");
+                                savePaymentDetails(response, 'completed');
+                            } else {
+                                showToast("Payment verification failed. Please contact support.");
+                            }
+                        },
+                        modal: {
+                            ondismiss: function () {
+                                showToast("Payment cancelled. You can retry from 'My Orders'.");
+                            }
+                        },
+                        prefill: {
+                            name: "User Name",
+                            email: "user@example.com",
+                            contact: "9999999999"
+                        },
+                        theme: { color: "#ffb400" }
+                    };
+    
+                    const rzp = new Razorpay(options);
+                    rzp.open();
+                    } catch (error) {
+                    console.error("Error during order placement:", error);
+                    showToast("An error occurred. Please try again.");
+                           }
+                        })
+                    })
+
+
+
+                                    // document.querySelectorAll('.quantity').forEach((button) => {
+                                    //     button.addEventListener('click', () => {
+                                    //         const arr = button.value.split(',')
+                                    //         const quantityDisplay = event.target.closest('.controls').querySelector('.quantity-display');
+                                    //         const cartItem = button.closest('.cart-item-container');
+                                    //         const quantityString = quantityDisplay.textContent;
+                                    //         const quantity = Number(quantityString);
+                                    //         const bookId = arr[0];
+                                    //         const count = Number(arr[1]);
+                                    //         fetch('/user/user-cart/change-quantity', {
+                                    //             method: 'POST',
+                                    //             headers: { 'Content-Type': 'application/json' },
+                                    //             body: JSON.stringify({ bookId, count })
+                                    //         })
+                                    //             .then(response => {
+                                    //                 if (!response.ok) {
+                                    //                     return response.json().then(error => { throw new Error(error.message); });
+                                    //                 }
+                                    //                 return response.json();
+                                    //             })
+                                    //             .then(data => {
+                                    //                 if (data.success) {
+                                    //                     quantityDisplay.textContent = quantity + count;
+                                    //                     if (data.message == "Item removed from cart successfully") {
+                                    //                         cartItem.style.transition = "opacity 0.5s ease";
+                                    //                         cartItem.style.opacity = 0;
+                                    //                         setTimeout(() => {
+                                    //                             cartItem.remove();
+
+                                    //                         }, 500);
+                                    //                     }
+                                    //                     showToast(data.message);
+                                    //                 }
+                                    //             })
+                                    //             .catch(error => {
+                                    //                 console.error('Error:', error);
+                                    //                 showToast(error.message || 'An error occurred');
+                                    //             });
+
+                                    //     })
+                                    // })
+
+                                    
+
+                            //  function updateCartCount(quantity) {
+                            //     const cartCountElement = document.querySelector('.cart-count');
+                            //     const currentCount = Number(cartCountElement.textContent) || 0;
+                            //     const updatedCount = currentCount - quantity;
+                            //    cartCountElement.textContent = updatedCount >= 0 ? updatedCount : 0;
+                            //    }
+
+                            // document.getElementById('order-button').addEventListener('click', () => {
+                            //  window.location.href = `/user/order/check-out`;
+                            // })
 
                         // Function to open the modal
                         function openReturnModal() {

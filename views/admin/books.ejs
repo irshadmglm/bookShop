@@ -18,7 +18,7 @@
         body {
             font-family: Arial, sans-serif;
             color: #333;
-             background-color: #fff9e5;
+            background: linear-gradient(to right, #fcfaf8, #f6efdb);
 
         }
 
@@ -42,36 +42,36 @@
             font-size: 16px;
         }
 
-        /* Search bar */
-        .search {
+        .search-bar {
             display: flex;
             align-items: center;
-            width: 100%;
-            max-width: 300px;
+            border: 2px solid #ffbb00;
+            border-radius: 25px;
+            padding: 5px;
         }
 
-        .search input {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-right: 10px;
-            width: 100%;
-        }
-
-        .search-btn {
-            background-color: #f39c12;
+        .search-bar input {
             border: none;
+            outline: none;
+            padding: 5px 10px;
+            width: 200px;
+            font-size: 16px;
+            background-color: #fff9e5;
+        }
+
+        .search-bar button {
+            background: linear-gradient(to right, #ff7b00, #ffbb00);
+            border: none;
+            padding: 5px 15px;
+            border-radius: 25px;
+            color: white;
             cursor: pointer;
-            padding: 8px;
-            font-size: 18px;
-            color: #fff;
-            border-radius: 4px;
         }
 
         /* Add book button */
         .add-book-btn {
             padding: 10px 16px;
-            background-color: #f5b34a;
+            background: linear-gradient(to right, #ff7b00, #ffbb00);
             color: #fff;
             border: none;
             border-radius: 4px;
@@ -92,7 +92,7 @@
         }
 
         .book-table thead {
-            background-color: #ffe39e;
+            background: linear-gradient(to right, #ffd5af, #ffe49b);
         }
 
         .book-table th,
@@ -213,6 +213,24 @@
         .show {
             opacity: 1;
 }
+.sort-button {
+    padding: 10px 20px;
+    font-size: 14px;
+    height: 40px;
+    width: 300px;
+    color: #492006;
+    background-color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.sort-button:hover {
+    background-color: #fff5a7;
+    color: #5b2a0a;
+}
+
     </style>
 </head>
 
@@ -233,26 +251,26 @@
                             </option>
                             <% }) %>
                     </select>
+                  
+<button id="best-selling" class="sort-button">Best Selling Products</button>
+
                 </div>
 
 
                 <!-- Search and Add Book Button -->
-                <div class="search">
-                    <input type="text" placeholder="Search...">
-                    <button class="search-btn">
-                        <i class="fas fa-search"></i>
-                    </button>
-
+                <div class="search-bar">
+                    <input type="text" id="search-input"  placeholder="Search Book">
+                    <button type="button" id="search-button">Search</button>
                 </div>
 
                 <div>
                     <!-- Deleted Books Button -->
-                    <button class="add-book-btn" onclick="window.location.href='/books/deleted-book'">
+                    <button class="add-book-btn" onclick="window.location.href='/admin/books/deleted-book'">
                         <i class="fas fa-trash-alt"></i>
                     </button>
 
                     <!-- Add Book Button -->
-                    <button class="add-book-btn" onclick="window.location.href='/books/add-book'">
+                    <button class="add-book-btn" onclick="window.location.href='/admin/books/add-book'">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
@@ -266,7 +284,11 @@
                         <th>Image</th>
                         <th>Book Name</th>
                         <th>Category</th>
+                        <th>Discount</th>
                         <th>Stock Level</th>
+                        <% if(books[0].totalSold){%>
+                        <th >Total Sold</th>
+                        <% } %>
                         <th>Price</th>
                         <th>Status</th>
                         <th>Action</th>
@@ -275,7 +297,7 @@
                 <tbody>
                     <% books.forEach(book=> { %>
                         <tr>
-                            <td><img src="images/uploads/<%= book.bookDetails.coverImageName %>" alt="Book Cover"></td>
+                            <td><img src="/images/uploads/<%= book.bookDetails.coverImageName %>" alt="Book Cover"></td>
                             <td>
                                 <%= book.bookDetails.book_name %>
                             </td>
@@ -283,9 +305,18 @@
                                 <%= book.bookDetails.category %>
                             </td>
                             <td>
+                                <%= book.bookDetails.discount || 'Nill' %>
+                            </td>
+                            <td>
                                 <%= book.bookDetails.stock %>
                             </td>
-                            <td>&#8377; <%= book.bookDetails.price %>
+                            <% if(book.totalSold){ %>
+                            <td>
+                                 <%= book.totalSold %>
+                            </td>
+                                <% } %>
+                            <td>
+                                &#8377; <%= book.bookDetails.price %>
                             </td>
                             <td class="<%= book.bookDetails.stock > 0 ? 'in-stock' : 'out-of-stock' %>">
                                 <%= book.bookDetails.stock> 0 ? 'In Stock' : 'Out of Stock' %>
@@ -327,16 +358,21 @@
                 categoryDropdown.addEventListener('change', function () {
                     const selectedCategoryId = this.value;
                     if (selectedCategoryId) {
-                        window.location.href = `/books?categoryId=${selectedCategoryId}`;
+                        window.location.href = `/admin/books?categoryId=${selectedCategoryId}`;
                     }
                 });
+                document.getElementById('best-selling').addEventListener('click', function () {
+
+               window.location.href = '/admin/books/best-selling?type=products';
+                  });
+
 
                 // Add Event Listeners for Edit, Delete, and View Buttons
                 document.querySelectorAll('.edit').forEach(button => {
                     button.addEventListener('click', function () {
                         const bookId = this.value;
                         if (bookId) {
-                            window.location.href = `/books/edit-book?bookId=${bookId}`;
+                            window.location.href = `/admin/books/edit-book?bookId=${bookId}`;
                         }
                     });
                 });
@@ -345,7 +381,7 @@
                     button.addEventListener('click', function () {
                         const bookId = this.value;
                         if (bookId) {
-                            window.location.href = `/books/delete-book?bookId=${bookId}`;
+                            window.location.href = `/admin/books/delete-book?bookId=${bookId}`;
                         }
                     });
                 });
@@ -354,7 +390,7 @@
                     button.addEventListener('click', function () {
                         const bookId = this.value;
                         if (bookId) {
-                            window.location.href = `/books/view-book?bookId=${bookId}`;
+                            window.location.href = `/admin/books/view-book?bookId=${bookId}`;
                         }
                     });
                 });
@@ -375,6 +411,18 @@
         });
     });
             </script>
+
+<script>
+    document.getElementById("search-button").addEventListener("click", () => {
+    const query = document.getElementById("search-input").value.trim();
+
+    if (query) {
+        window.location.href = `/admin/books/search?q=${query}`;
+    }
+});
+
+
+</script>
 </body>
 
 </html>

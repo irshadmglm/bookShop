@@ -1,11 +1,38 @@
 const bookHelper = require('../../helpers/admin/bookHelper');
-
+const userBookHelper = require('../../helpers/user/userBookHelper');
 module.exports = {
-    viewBooks: (req,res)=>{
+    viewBooks: async (req, res) => {
+        const { categoryId, price, sort } = req.query;
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10; 
+    
+        try {
+            const { books, categories, totalPages, currentPage } = await userBookHelper.getBooks(categoryId, page, limit, price, sort);
+    
+            const breadcrumbs = [
+                { name: 'Home', url: '/user' },
+                // { name: 'View Book', url: `/userbook/view-book?bookId=${req.query.bookId}` }
+            ];
+    
+            res.render('user/userhome', {
+                books,
+                categories,
+                totalPages,
+                currentPage,
+                breadcrumbs
+            });
+        } catch (error) {
+            console.log(error);
+            
+            res.status(500).send("An error occurred.");
+        }
+    },
+    viewBook: (req,res)=>{
         let bookId = req.query.bookId;
         const breadcrumbs = [
             { name: 'Home', url: '/' },
-            { name: 'View Book', url: `/userbook/view-book?bookId=${bookId}` }
+            { name: 'View Book', url: `/userbooks/view-book?bookId=${bookId}` }
           ];
         bookHelper.getBook(bookId).then(async(data)=>{
             const [book, categories] = data;        
@@ -15,7 +42,6 @@ module.exports = {
             })
         })
     },
-
     rating: (req,res)=>{
         const {stars, bookId, review} = req.body;
         let userId = req.session.user._id;
@@ -31,14 +57,29 @@ module.exports = {
         })
     },
 
-    filter: (req,res)=>{
+    filter: async (req,res)=>{
         const { categoryId, price, sort } = req.query;
-     bookHelper.filterBooks(categoryId,price, sort).then((response)=>{
-       const {categories,books} = response;
-       res.status(200).json({ success: true, books: response.books, categories: response.categories });
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10; 
+        userBookHelper.getBooks(categoryId, page, limit, price, sort).then(({ books, categories, totalPages, currentPage })=>{
+       res.status(200).json({ success: true, books, categories, totalPages, currentPage });
      }).catch((error)=>{
         res.status(500).json({ message: error.message || 'An unexpected error occurred' });
      })
-    
     },
+
+    search: async (req, res) => {
+        try {
+            const query = req.query.q?.toLowerCase() || "";
+            if (!query) {
+                return res.status(400).json({ error: "Query parameter 'q' is required." });
+            }
+            const books = await userBookHelper.search(query);
+            res.status(200).json({ success: true, books });
+        } catch (error) {
+            console.error("Error in search controller:", error);
+            res.status(500).json({ success: false, error: "Internal Server Error" });
+    }
+    
+}
 }

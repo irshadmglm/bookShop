@@ -20,7 +20,7 @@ module.exports = {
                 req.session.admin = response.admin;
                 req.session.logedIn = true;
             }
-            res.redirect('/books');
+            res.redirect('/admin/books');
         }).catch((error)=>{
             res.render('admin/login',{message:error.message});
         })

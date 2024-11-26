@@ -179,11 +179,11 @@
             <div class="zoom">
                 <!-- Original Image -->
                 <div class="original book-cover">
-                    <img src="images/uploads/<%= book.bookDetails.coverImageName %>" id="target">
+                    <img src="/images/uploads/<%= book.bookDetails.coverImageName %>" id="target">
                 </div>
                 <!-- Zoomed Viewer -->
                 <div class="viewer">
-                    <img src="images/uploads/<%= book.bookDetails.coverImageName %>" alt="Zoomed Image">
+                    <img src="/images/uploads/<%= book.bookDetails.coverImageName %>" alt="Zoomed Image">
                 </div>
                 <!-- Magnifier Effect -->
                 <div class="magnifier"></div>
@@ -244,7 +244,7 @@
             button.addEventListener('click', function() {
                 const bookId = this.id;
                 if (bookId) {
-                    window.location.href = `/books/edit-book?bookId=${bookId}`;
+                    window.location.href = `/admin/books/edit-book?bookId=${bookId}`;
                 }
             });
         });
