@@ -39,6 +39,7 @@ console.log(razorpay_order_id, razorpay_payment_id, razorpay_signature );
       let items = req.body.items;
       let bookId = req.body.bookId;
       let userId = req.session.user._id;
+console.log(orderId,bookId);
 
     const generatedSignature = crypto
       .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)

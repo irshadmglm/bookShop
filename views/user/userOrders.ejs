@@ -624,7 +624,8 @@
                                     bookId: bookId
                                 })
                             }).then(res => res.json());
-    
+                            console.log("verificationResponse", verificationResponse);
+                            
                             if (verificationResponse.success) {
                                 showToast("Payment successful and verified!");
                                 savePaymentDetails(response, 'completed');

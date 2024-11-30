@@ -16,6 +16,7 @@ module.exports = {
     changeOrderStatus: (orderId,bookId,userId,status)=>{
         return new Promise(async(resolve,reject)=>{
             try {
+                bookId = new ObjectId(bookId);
                 const result= await db.get().collection(collections.ORDER_COLLECTION).updateOne(
                     {
                         _id: new ObjectId(orderId),

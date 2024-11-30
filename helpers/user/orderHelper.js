@@ -55,19 +55,35 @@ module.exports = {
         return new Promise(async (resolve, reject) => {
             try {
                 let totalAmount = 0;
+                console.log(item);
                 
-                    item.orderStatus = "Pending"; 
-                    item.statusChangedAt = new Date(),
-                    item.totalPrice = item.price 
-                    totalAmount += item.price;  
+                    item.bookDetails.orderStatus = "Pending"; 
+                    item.bookDetails.statusChangedAt = new Date(),
+                    item.bookDetails.totalPrice = item.bookDetails.price 
+                    totalAmount += item.bookDetails.price;  
+                    item.bookDetails.bookId = new ObjectId(item.bookDetails.bookId);
+                    item.bookDetails.bookName = item.bookDetails.book_name;
+                    delete item.bookDetails.book_name;
+                    item.bookDetails.authorName = item.bookDetails.author_name;
+                    delete item.bookDetails.author_name;
+                    item.bookDetails.quantity = 1;
+                    item.bookDetails.price = parseFloat(item.bookDetails.price);
+                    let discountValue = 0;
+                    if(item.bookDetails.discount){
+                        discountValue = item.bookDetails.price * parseFloat(item.bookDetails.discount) /100
+                        item.bookDetails.subtotal = item.bookDetails.price - discountValue
+                    }else{
+                        item.bookDetails.subtotal = item.bookDetails.price;
+                    }
 
+                
                      db.get().collection(collections.BOOK_COLLECTION).updateOne(
-                        { _id: item.bookId },
-                        { $inc: { "bookDetails.stock": -item.stock } }
+                        { _id: new ObjectId(item.bookDetails.bookId) },
+                        { $inc: { "bookDetails.stock": -1 } }
                     );
              
-               
-                    let items =item.bookDetails
+                    let items = [];
+                     items.push(item.bookDetails)
     
                 // Insert a new order for each checkout
              const  order = await db.get().collection(collections.ORDER_COLLECTION).insertOne({
