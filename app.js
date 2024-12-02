@@ -47,6 +47,7 @@ app.use('/auth' , middlewares.cartCount);
 
 
 app.set("view engine", "ejs");
+process.env.NODE_OPTIONS = '--tls-min-v1.2';
 
 db.connect((err) => {
     if (err) console.log("connection error" + err);

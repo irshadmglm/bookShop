@@ -40,7 +40,12 @@ module.exports = {
                     }
                 }
             ]).toArray();
-            result[0].totalCouponDeduction = couponDeductionResult[0]?.totalCouponDeduction || 0;
+            if (result && result[0]) {
+              result[0].totalCouponDeduction = couponDeductionResult[0]?.totalCouponDeduction || 0;
+            } else {
+              console.log("Result[0] is undefined or empty");
+            }
+            
             
             resolve(result);
         });
