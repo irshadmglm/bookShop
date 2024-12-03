@@ -11,7 +11,7 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(session({
-    secret: "pGf3@4*Fz9q%LdWx8kN6$1Bv!A7yZtP", 
+    secret: process.env.SESSION_SECRET, 
     resave: false, 
     saveUninitialized: false, 
     cookie: { maxAge: 1800000 } 
