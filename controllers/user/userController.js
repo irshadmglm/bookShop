@@ -190,7 +190,7 @@ module.exports = {
         const token = crypto.randomBytes(32).toString('hex');
         const expiration = Date.now() + 3600000; 
         await userHelper.addPasswordResets(email,token,expiration);
-        const resetLink = `http://13.60.30.244:3000/user/reset-password?token=${token}`;
+        const resetLink = `http://bookshoponline.live/user/reset-password?token=${token}`;
          userHelper.sendResetEmail(email, resetLink);
          res.redirect('/user');
     },
