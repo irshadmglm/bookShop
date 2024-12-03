@@ -127,7 +127,7 @@ module.exports = {
         userHelper.userAddress(req.session.user._id).then((address)=>{
             console.log(address);
             
-            res.render('user/userinfo',{address:address,user:req.session.user})
+            res.render('user/userInfo',{address:address,user:req.session.user})
         }).catch((err)=>{
             console.log(err);
             res.redirect('/user');
