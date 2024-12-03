@@ -12,7 +12,7 @@ console.log('GOOGLE_CALLBACK_URL:', process.env.GOOGLE_CALLBACK_URL);
 
 // Configure Google OAuth Strategy
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientID: process.env.GOOGLE_CLIENT_ID || "295888724760-i6lurtc6ql9qk3dg39pp0gk575ruds2h.apps.googleusercontent.com",
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: process.env.GOOGLE_CALLBACK_URL,
     passReqToCallback: true,
