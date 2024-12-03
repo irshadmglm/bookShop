@@ -6,7 +6,9 @@ const state = {
 };
 
 
-const url = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017'; 
+// const url = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017'; 
+
+const url = "mongodb+srv://irsgmlg:irsmglm8187@cluster0.8fku5.mongodb.net/bookshop?retryWrites=true&w=majority" 
 require('dotenv').config(); 
 
 const dbName = process.env.DB_NAME || 'bookshop';
